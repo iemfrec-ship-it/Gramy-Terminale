@@ -1,0 +1,2669 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GRAMY – Grammaire Anglaise</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet"/>
+  <style>
+    /* ========== VARIABLES ========== */
+    :root {
+      --mario-red: #E52521;
+      --mario-blue: #049CD8;
+      --mario-yellow: #FBD000;
+      --mario-green: #43B047;
+      --mario-dark: #1a1a2e;
+      --mario-darker: #0f0f1a;
+      --mario-white: #FFFFFF;
+      --mario-orange: #F89400;
+      --mario-brown: #8B4513;
+      --pixel-shadow: 4px 4px 0px rgba(0,0,0,0.5);
+      --pixel-shadow-yellow: 4px 4px 0px #b8860b;
+      --pixel-shadow-red: 4px 4px 0px #8B0000;
+      --pixel-shadow-blue: 4px 4px 0px #023e6e;
+      --pixel-shadow-green: 4px 4px 0px #1a5c1e;
+    }
+
+    /* ========== RESET & BASE ========== */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: var(--mario-dark);
+      color: var(--mario-white);
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* ========== ÉTOILES FOND ========== */
+    .stars-bg {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .star {
+      position: absolute;
+      width: 3px; height: 3px;
+      background: white;
+      border-radius: 50%;
+      animation: twinkle 2s infinite alternate;
+    }
+    @keyframes twinkle {
+      from { opacity: 0.2; transform: scale(1); }
+      to { opacity: 1; transform: scale(1.5); }
+    }
+
+    /* ========== NUAGES ANIMÉS ========== */
+    .cloud {
+      position: fixed;
+      background: white;
+      border-radius: 50px;
+      opacity: 0.08;
+      pointer-events: none;
+      z-index: 0;
+      animation: floatCloud linear infinite;
+    }
+    .cloud::before, .cloud::after {
+      content: '';
+      position: absolute;
+      background: white;
+      border-radius: 50%;
+    }
+    .cloud::before { width: 60%; height: 150%; top: -40%; left: 20%; }
+    .cloud::after  { width: 40%; height: 120%; top: -30%; left: 50%; }
+    @keyframes floatCloud {
+      from { transform: translateX(-200px); }
+      to   { transform: translateX(110vw); }
+    }
+
+    /* ========== LAYOUT PRINCIPAL ========== */
+    .app-container {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ========== PAGES (routing) ========== */
+    .page { display: none; flex-direction: column; align-items: center; min-height: 100vh; padding: 20px; }
+    .page.active { display: flex; }
+
+    /* ========== HEADER ========== */
+    .mario-header {
+      text-align: center;
+      padding: 30px 20px 10px;
+      width: 100%;
+    }
+    .mario-header h1 {
+      font-family: 'Press Start 2P', monospace;
+      font-size: clamp(1.2rem, 4vw, 2.5rem);
+      color: var(--mario-yellow);
+      text-shadow: var(--pixel-shadow-yellow);
+      letter-spacing: 4px;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    .mario-header .subtitle {
+      font-family: 'Press Start 2P', monospace;
+      font-size: clamp(0.4rem, 1.5vw, 0.65rem);
+      color: var(--mario-white);
+      margin-top: 10px;
+      opacity: 0.8;
+    }
+    @keyframes pulse {
+      0%, 100% { text-shadow: 4px 4px 0px #b8860b, 0 0 20px rgba(251,208,0,0.3); }
+      50%       { text-shadow: 4px 4px 0px #b8860b, 0 0 40px rgba(251,208,0,0.7); }
+    }
+
+    /* ========== BOUTONS ========== */
+    .btn {
+      font-family: 'Press Start 2P', monospace;
+      font-size: clamp(0.5rem, 1.5vw, 0.75rem);
+      padding: 14px 24px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: transform 0.1s, box-shadow 0.1s;
+      text-decoration: none;
+      display: inline-block;
+      letter-spacing: 1px;
+    }
+    .btn:active { transform: translateY(3px); }
+
+    .btn-yellow {
+      background: var(--mario-yellow);
+      color: #1a1a00;
+      box-shadow: var(--pixel-shadow-yellow);
+    }
+    .btn-yellow:hover { transform: translateY(-2px); box-shadow: 6px 6px 0px #b8860b; }
+
+    .btn-red {
+      background: var(--mario-red);
+      color: white;
+      box-shadow: var(--pixel-shadow-red);
+    }
+    .btn-red:hover { transform: translateY(-2px); box-shadow: 6px 6px 0px #8B0000; }
+
+    .btn-blue {
+      background: var(--mario-blue);
+      color: white;
+      box-shadow: var(--pixel-shadow-blue);
+    }
+    .btn-blue:hover { transform: translateY(-2px); box-shadow: 6px 6px 0px #023e6e; }
+
+    .btn-green {
+      background: var(--mario-green);
+      color: white;
+      box-shadow: var(--pixel-shadow-green);
+    }
+    .btn-green:hover { transform: translateY(-2px); box-shadow: 6px 6px 0px #1a5c1e; }
+
+    .btn-gray {
+      background: #555;
+      color: #ccc;
+      box-shadow: 4px 4px 0px #222;
+      cursor: not-allowed;
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 3px solid var(--mario-yellow);
+      color: var(--mario-yellow);
+      box-shadow: var(--pixel-shadow-yellow);
+    }
+    .btn-outline:hover { background: rgba(251,208,0,0.1); }
+
+    .btn-sm { font-size: 0.45rem; padding: 8px 14px; }
+    .btn-lg { font-size: clamp(0.6rem, 2vw, 0.9rem); padding: 18px 32px; }
+    .btn-full { width: 100%; text-align: center; }
+
+    /* ========== CARDS ========== */
+    .card {
+      background: rgba(255,255,255,0.05);
+      border: 3px solid rgba(255,255,255,0.15);
+      border-radius: 12px;
+      padding: 24px;
+      backdrop-filter: blur(10px);
+      width: 100%;
+      max-width: 500px;
+    }
+    .card-title {
+      font-family: 'Press Start 2P', monospace;
+      font-size: clamp(0.5rem, 1.5vw, 0.75rem);
+      color: var(--mario-yellow);
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    /* ========== INPUTS ========== */
+    .input-group { margin-bottom: 16px; }
+    .input-group label {
+      display: block;
+      font-size: 0.85rem;
+      color: #aaa;
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+    .mario-input {
+      width: 100%;
+      background: rgba(0,0,0,0.4);
+      border: 3px solid rgba(255,255,255,0.2);
+      border-radius: 6px;
+      color: white;
+      font-family: 'Press Start 2P', monospace;
+      font-size: clamp(0.6rem, 1.5vw, 0.85rem);
+      padding: 12px 16px;
+      transition: border-color 0.2s;
+      letter-spacing: 3px;
+    }
+    .mario-input:focus {
+      outline: none;
+      border-color: var(--mario-yellow);
+      box-shadow: 0 0 15px rgba(251,208,0,0.3);
+    }
+    .mario-input::placeholder { color: #555; letter-spacing: 1px; }
+
+    .two-cols {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    /* ========== NOTIFICATIONS / MESSAGES ========== */
+    .msg-box {
+      border-radius: 8px;
+      padding: 14px 18px;
+      margin: 12px 0;
+      font-size: 0.85rem;
+      font-weight: 700;
+      display: none;
+    }
+    .msg-box.show { display: block; }
+    .msg-error  { background: rgba(229,37,33,0.2); border: 2px solid var(--mario-red); color: #ff8080; }
+    .msg-success{ background: rgba(67,176,71,0.2); border: 2px solid var(--mario-green); color: #80ff80; }
+    .msg-info   { background: rgba(4,156,216,0.2); border: 2px solid var(--mario-blue); color: #80d4ff; }
+    .msg-warn   { background: rgba(251,208,0,0.15); border: 2px solid var(--mario-yellow); color: var(--mario-yellow); }
+
+    /* ========== BARRE DE VIE / XP ========== */
+    .xp-bar-wrap {
+      background: rgba(0,0,0,0.4);
+      border: 3px solid rgba(255,255,255,0.2);
+      border-radius: 20px;
+      overflow: hidden;
+      height: 22px;
+      width: 100%;
+    }
+    .xp-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--mario-green), var(--mario-yellow));
+      border-radius: 20px;
+      transition: width 0.8s cubic-bezier(0.4,0,0.2,1);
+      position: relative;
+      overflow: hidden;
+    }
+    .xp-bar-fill::after {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      animation: shimmer 2s infinite;
+    }
+    @keyframes shimmer { to { left: 200%; } }
+
+    /* ========== GRILLE THÈMES ========== */
+    .themes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 20px;
+      width: 100%;
+      max-width: 1000px;
+      padding: 10px;
+    }
+    .theme-card {
+      background: rgba(255,255,255,0.05);
+      border: 3px solid rgba(255,255,255,0.15);
+      border-radius: 12px;
+      padding: 20px;
+      cursor: pointer;
+      transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+    .theme-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--mario-yellow);
+      box-shadow: 0 8px 30px rgba(251,208,0,0.2);
+    }
+    .theme-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 4px; height: 100%;
+      background: var(--mario-yellow);
+    }
+    .theme-card.completed::before { background: var(--mario-green); }
+    .theme-card.in-progress::before { background: var(--mario-orange); }
+
+    .theme-card-title {
+      font-family: 'Press Start 2P', monospace;
+      font-size: clamp(0.4rem, 1.2vw, 0.6rem);
+      color: var(--mario-yellow);
+      margin-bottom: 10px;
+      line-height: 1.6;
+    }
+    .theme-card-lexique {
+      font-size: 0.8rem;
+      color: #aaa;
+      margin-bottom: 14px;
+    }
+    .levels-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .level-dot {
+      font-size: 1.1rem;
+      transition: transform 0.2s;
+    }
+    .level-dot:hover { transform: scale(1.3); }
+    .theme-score {
+      margin-top: 12px;
+      font-size: 0.8rem;
+      color: var(--mario-green);
+      font-weight: 900;
+    }
+
+    /* ========== NIVEAUX ========== */
+    .levels-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 16px;
+      width: 100%;
+      max-width: 900px;
+    }
+    .level-card {
+      background: rgba(255,255,255,0.05);
+      border: 3px solid rgba(255,255,255,0.15);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.2s, border-color 0.2s;
+      position: relative;
+    }
+    .level-card:not(.locked):hover {
+      transform: translateY(-4px);
+      border-color: var(--mario-blue);
+    }
+    .level-card.locked {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .level-card.done { border-color: var(--mario-green); }
+    .level-icon { font-size: 2.5rem; margin-bottom: 10px; }
+    .level-name {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 0.55rem;
+      color: var(--mario-yellow);
+      margin-bottom: 8px;
+    }
+    .level-type { font-size: 0.8rem; color: #aaa; }
+    .level-score { font-size: 0.8rem; color: var(--mario-green); margin-top: 8px; font-weight: 900; }
+
+    /* ========== EXERCICE ========== */
+    .exercise-wrap {
+      width: 100%;
+      max-width: 700px;
+    }
+    .exercise-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .ex-progress {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 0.6rem;
+      color: var(--mario-yellow);
+    }
+    .ex-score-live {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 0.6rem;
+      color: var(--mario-green);
+    }
+    .question-card {
+      background: rgba(255,255,255,0.07);
+      border: 3px solid rgba(255,255,255,0.2);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+    .question-text {
+      font-size: 1.05rem;
+      font-weight: 700;
+      line-height: 1.6;
+      margin-bottom: 20px;
+      color: white;
+    }
+    .blank { 
+      display: inline-block;
+      border-bottom: 3px solid var(--mario-yellow);
+      min-width: 80px;
+      margin: 0 4px;
+    }
+
+    /* QCM Options */
+    .options-list { display: flex; flex-direction: column; gap: 10px; }
+    .option-btn {
+      background: rgba(255,255,255,0.05);
+      border: 3px solid rgba(255,255,255,0.2);
+      border-radius: 8px;
+      padding: 12px 18px;
+      color: white;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .option-btn:hover:not(:disabled) {
+      border-color: var(--mario-yellow);
+      background: rgba(251,208,0,0.1);
+    }
+    .option-btn.selected { border-color: var(--mario-blue); background: rgba(4,156,216,0.15); }
+    .option-btn.correct  { border-color: var(--mario-green); background: rgba(67,176,71,0.2); }
+    .option-btn.wrong    { border-color: var(--mario-red); background: rgba(229,37,33,0.2); }
+    .option-letter {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 0.55rem;
+      background: rgba(255,255,255,0.1);
+      border-radius: 4px;
+      padding: 4px 8px;
+      min-width: 32px;
+      text-align: center;
+      color: var(--mario-yellow);
+    }
+
+    /* Phrases à trous – input */
+    .trous-input {
+      background: rgba(0,0,0,0.4);
+      border: 3px solid var(--mario-yellow);
+      border-radius: 6px;
+      color: white;
+      font-size: 1rem;
+      font-weight: 700;
+      padding: 8px 12px;
+      width: 140px;
+      text-align: center;
+      font-family: 'Nunito', sans-serif;
+    }
+    .trous-input:focus { outline: none; box-shadow: 0 0 10px rgba(251,208,0,0.4); }
+    .trous-input.correct { border-color: var(--mario-green); background: rgba(67,176,71,0.15); }
+    .trous-input.wrong   { border-color: var(--mario-red); background: rgba(229,37,33,0.15); }
+
+    /* Remettre dans l'ordre */
+    .words-bank {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+      min-height: 50px;
+      background: rgba(0,0,0,0.3);
+      border: 2px dashed rgba(255,255,255,0.2);
+      border-radius: 8px;
+      padding: 12px;
+      align-items: center;
+    }
+    .word-chip {
+      background: var(--mario-blue);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 8px 14px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 3px 3px 0px #023e6e;
+      transition: transform 0.1s;
+      font-family: 'Nunito', sans-serif;
+    }
+    .word-chip:hover { transform: translateY(-2px); }
+    .word-chip.placed { background: var(--mario-green); box-shadow: 3px 3px 0px #1a5c1e; }
+    .sentence-build {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      min-height: 50px;
+      background: rgba(251,208,0,0.05);
+      border: 3px solid rgba(251,208,0,0.3);
+      border-radius: 8px;
+      padding: 12px;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+    .placed-chip {
+      background: var(--mario-yellow);
+      color: #1a1a00;
+      border: none;
+      border-radius: 6px;
+      padding: 8px 14px;
+      font-size: 0.9rem;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 3px 3px 0px #b8860b;
+      font-family: 'Nunito', sans-serif;
+    }
+
+    /* Trouver l'erreur */
+    .erreur-btns { display: flex; gap: 12px; flex-wrap: wrap; }
+    .erreur-verdict {
+      background: rgba(255,255,255,0.05);
+      border: 3px solid rgba(255,255,255,0.2);
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+      flex: 1;
+      text-align: center;
+    }
+    .erreur-verdict:hover:not(:disabled) { border-color: var(--mario-yellow); }
+    .erreur-verdict.selected-correct { border-color: var(--mario-green); background: rgba(67,176,71,0.15); }
+    .erreur-verdict.selected-incorrect { border-color: var(--mario-red); background: rgba(229,37,33,0.15); }
+    .correction-input-wrap { margin-top: 14px; display: none; }
+    .correction-input-wrap.show { display: block; }
+    .correction-hint { font-size: 0.8rem; color: #aaa; margin-bottom: 6px; }
+
+    /* ========== CORRECTION APRÈS QUESTION ========== */
+    .explication-box {
+      background: rgba(4,156,216,0.1);
+      border: 3px solid var(--mario-blue);
+      border-radius: 10px;
+      padding: 16px;
+      margin-top: 14px;
+      font-size: 0.9rem;
+      line-height: 1.6;
+      display: none;
+    }
+    .explication-box.show { display: block; }
+    .explication-box .ex-label {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 0.5rem;
+      color: var(--mario-blue);
+      margin-bottom: 8px;
+    }
+
+    /* ========== SCORE FINAL ========== */
+    .score-result {
+      text-align: center;
+      padding: 30px 20px;
+      width: 100%;
+      max-width: 600px;
+    }
+    .score-big {
+      font-family: 'Press Start 2P', monospace;
+      font-size: clamp(1.5rem, 6vw, 3rem);
+      margin: 20px 0;
+      animation: pop 0.5s cubic-bezier(0.4,0,0.2,1);
+    }
+    @keyframes pop {
+      0%   { transform: scale(0); }
+      70%  { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+    .score-stars { font-size: 2.5rem; margin: 16px 0; letter-spacing: 8px; }
+    .score-msg {
+      font-family: 'Press Start 2P', monospace;
+      font-size: clamp(0.5rem, 1.5vw, 0.75rem);
+      line-height: 2;
+      margin: 16px 0;
+    }
+    .retry-box {
+      background: rgba(229,37,33,0.15);
+      border: 3px solid var(--mario-red);
+      border-radius: 12px;
+      padding: 20px;
+      margin: 20px 0;
+      display: none;
+    }
+    .retry-box.show { display: block; }
+    .retry-box-msg {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 0.55rem;
+      color: #ff8080;
+      margin-bottom: 16px;
+      line-height: 1.8;
+    }
+    .retry-btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+
+    /* ========== CORRECTIONS DÉTAIL ========== */
+    .corrections-list { width: 100%; max-width: 700px; }
+    .correction-item {
+      background: rgba(255,255,255,0.04);
+      border-left: 4px solid var(--mario-green);
+      border-radius: 0 8px 8px 0;
+      padding: 14px 16px;
+      margin-bottom: 12px;
+    }
+    .correction-item.wrong { border-left-color: var(--mario-red); }
+    .corr-q { font-weight: 700; margin-bottom: 6px; color: white; }
+    .corr-given { font-size: 0.85rem; color: #aaa; }
+    .corr-given span { color: var(--mario-red); font-weight: 700; }
+    .corr-given span.ok { color: var(--mario-green); }
+    .corr-expl { font-size: 0.85rem; color: #80d4ff; margin-top: 6px; font-style: italic; }
+
+    /* ========== DASHBOARD ÉLÈVE ========== */
+    .eleve-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      max-width: 1000px;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .eleve-id {
+      font-family: 'Press Start 2P', monospace;
+      font-size: clamp(0.4rem, 1.2vw, 0.65rem);
+      color: var(--mario-yellow);
+    }
+    .lives-row { display: flex; gap: 4px; font-size: 1.3rem; }
+
+    /* ========== INTERFACE PROF ========== */
+    .prof-tabs {
+      display: flex;
+      gap: 0;
+      border-bottom: 3px solid rgba(255,255,255,0.15);
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+    .prof-tab {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 0.5rem;
+      padding: 12px 16px;
+      background: transparent;
+      border: none;
+      color: #aaa;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -3px;
+      transition: color 0.2s;
+    }
+    .prof-tab.active { color: var(--mario-yellow); border-bottom-color: var(--mario-yellow); }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    .eleve-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 8px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+    .eleve-row .e-id {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 0.55rem;
+      color: var(--mario-yellow);
+      min-width: 80px;
+    }
+    .eleve-row .e-class { font-size: 0.85rem; color: #aaa; min-width: 60px; }
+    .eleve-row .e-score { font-size: 0.85rem; color: var(--mario-green); font-weight: 900; }
+
+    .json-area {
+      width: 100%;
+      background: rgba(0,0,0,0.5);
+      border: 2px solid rgba(255,255,255,0.2);
+      border-radius: 8px;
+      color: #80ff80;
+      font-family: monospace;
+      font-size: 0.75rem;
+      padding: 14px;
+      min-height: 200px;
+      resize: vertical;
+    }
+    .json-area:focus { outline: none; border-color: var(--mario-green); }
+
+    .format-hint {
+      background: rgba(0,0,0,0.4);
+      border: 2px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 16px;
+      font-family: monospace;
+      font-size: 0.75rem;
+      color: #aaa;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      margin-top: 12px;
+      max-height: 250px;
+      overflow-y: auto;
+    }
+
+    /* ========== PIÈCES / CONFETTI ANIMATION ========== */
+    .coin {
+      position: fixed;
+      font-size: 1.5rem;
+      pointer-events: none;
+      animation: coinFall 1.5s ease-in forwards;
+      z-index: 9999;
+    }
+    @keyframes coinFall {
+      0%   { opacity: 1; transform: translateY(0) rotate(0deg); }
+      100% { opacity: 0; transform: translateY(-200px) rotate(720deg); }
+    }
+
+    /* ========== FOOTER ========== */
+    footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 0.75rem;
+      color: #555;
+      position: relative;
+      z-index: 1;
+      margin-top: auto;
+    }
+    footer a {
+      color: #555;
+      text-decoration: none;
+      margin-left: 16px;
+    }
+    footer a:hover { color: var(--mario-yellow); }
+
+    /* ========== PAGE RGPD ========== */
+    .rgpd-content {
+      max-width: 700px;
+      width: 100%;
+      padding: 40px 20px;
+    }
+    .rgpd-content h2 {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 0.9rem;
+      color: var(--mario-yellow);
+      margin-bottom: 24px;
+    }
+    .rgpd-content p { color: #aaa; line-height: 1.8; margin-bottom: 16px; }
+
+    /* ========== FICHE BILAN (écran) ========== */
+    .bilan-section {
+      background: rgba(255,255,255,0.04);
+      border: 2px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 16px;
+      width: 100%;
+      max-width: 750px;
+    }
+    .bilan-theme-title {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 0.6rem;
+      color: var(--mario-yellow);
+      margin-bottom: 14px;
+    }
+    .bilan-niveau-title {
+      font-size: 0.85rem;
+      font-weight: 900;
+      color: var(--mario-blue);
+      margin: 14px 0 8px;
+    }
+    .bilan-item {
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      font-size: 0.85rem;
+      line-height: 1.6;
+    }
+    .bilan-item:last-child { border-bottom: none; }
+
+    /* ========== PRINT CSS ========== */
+    @media print {
+      body { background: white !important; color: black !important; }
+      .stars-bg, .cloud, footer, .btn, .no-print { display: none !important; }
+      .page { display: block !important; }
+      .page:not(#page-bilan) { display: none !important; }
+      #page-bilan { display: block !important; padding: 0 !important; }
+      .bilan-section { border-color: #ccc !important; background: white !important; page-break-inside: avoid; }
+      .bilan-theme-title { color: #333 !important; }
+      .bilan-niveau-title { color: #0066cc !important; }
+      .bilan-item { color: black !important; border-color: #eee !important; }
+      * { font-family: Arial, sans-serif !important; }
+      .print-header { display: block !important; }
+    }
+    .print-header { display: none; }
+
+    /* ========== RESPONSIVE ========== */
+    @media (max-width: 600px) {
+      .two-cols { grid-template-columns: 1fr 1fr; }
+      .themes-grid { grid-template-columns: 1fr; }
+      .levels-container { grid-template-columns: 1fr 1fr; }
+      .retry-btns { flex-direction: column; }
+      .erreur-btns { flex-direction: column; }
+    }
+
+    /* ========== SÉPARATEUR ========== */
+    .section-sep {
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(251,208,0,0.3), transparent);
+      margin: 20px 0;
+    }
+
+    /* ========== BACK BUTTON ========== */
+    .back-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: none;
+      border: none;
+      color: #aaa;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 700;
+      padding: 8px 0;
+      margin-bottom: 16px;
+      transition: color 0.2s;
+    }
+    .back-btn:hover { color: var(--mario-yellow); }
+
+    /* ========== CONFETTI ========== */
+    .confetti-piece {
+      position: fixed;
+      width: 10px; height: 10px;
+      pointer-events: none;
+      z-index: 9999;
+      animation: confettiFall 2s ease-in forwards;
+    }
+    @keyframes confettiFall {
+      0%   { opacity: 1; transform: translateY(0) rotate(0deg); }
+      100% { opacity: 0; transform: translateY(300px) rotate(720deg); }
+    }
+
+    /* ========== LOADING SPINNER ========== */
+    .spinner {
+      display: inline-block;
+      width: 20px; height: 20px;
+      border: 3px solid rgba(251,208,0,0.3);
+      border-top-color: var(--mario-yellow);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+<!-- ========== FOND ANIMÉ ========== -->
+<div class="stars-bg" id="starsBg"></div>
+
+<div class="app-container">
+
+  <!-- ===================== PAGE : ACCUEIL ===================== -->
+  <div class="page active" id="page-accueil">
+    <div class="mario-header">
+      <h1>🎮 GRAMY</h1>
+      <p class="subtitle">Grammaire Anglaise – Terminale Bac Pro</p>
+    </div>
+    <div style="font-size:5rem;margin:20px 0;animation:pulse 1.5s ease-in-out infinite;">🍄</div>
+    <p style="font-size:1rem;color:#aaa;margin-bottom:30px;text-align:center;max-width:400px;">
+      Entraîne-toi en grammaire anglaise et débloque tous les niveaux !
+    </p>
+    <div style="display:flex;flex-direction:column;gap:16px;width:100%;max-width:320px;">
+      <button class="btn btn-yellow btn-lg btn-full" onclick="showPage('page-login-eleve')">🎮 Jouer</button>
+      <button class="btn btn-outline btn-full" onclick="showPage('page-login-prof')">👨‍🏫 Espace Professeur</button>
+    </div>
+    <footer>
+      Créé par C. Iemfre
+      <a href="#" onclick="showPage('page-rgpd');return false;">RGPD</a>
+    </footer>
+  </div>
+
+  <!-- ===================== PAGE : RGPD ===================== -->
+  <div class="page" id="page-rgpd">
+    <div class="rgpd-content">
+      <button class="back-btn" onclick="showPage('page-accueil')">← Retour</button>
+      <h2>🔒 Politique de confidentialité</h2>
+      <p>Cette section sera complétée ultérieurement.</p>
+      <p style="color:#666;font-size:0.85rem;">Application GRAMY – Grammaire Anglaise Terminale Bac Pro<br>Créé par C. Iemfre</p>
+    </div>
+  </div>
+
+  <!-- ===================== PAGE : LOGIN PROF ===================== -->
+  <div class="page" id="page-login-prof">
+    <div class="mario-header">
+      <h1>👨‍🏫 PROF</h1>
+    </div>
+    <div class="card">
+      <p class="card-title">Accès Professeur</p>
+      <div class="input-group">
+        <label>Code d'accès</label>
+        <input class="mario-input" type="password" id="prof-code-input" placeholder="****" maxlength="10"
+          onkeydown="if(event.key==='Enter')checkProfCode()" />
+      </div>
+      <div class="msg-box msg-error" id="prof-code-error">❌ Mauvais code ! Waouh, réessaie !</div>
+      <div style="display:flex;gap:12px;margin-top:8px;">
+        <button class="btn btn-gray btn-full" onclick="showPage('page-accueil')">← Retour</button>
+        <button class="btn btn-yellow btn-full" onclick="checkProfCode()">Entrer 🔑</button>
+      </div>
+    </div>
+    <footer>Créé par C. Iemfre <a href="#" onclick="showPage('page-rgpd');return false;">RGPD</a></footer>
+  </div>
+
+  <!-- ===================== PAGE : DASHBOARD PROF ===================== -->
+  <div class="page" id="page-prof">
+    <div class="mario-header">
+      <h1>👨‍🏫 PROF</h1>
+      <p class="subtitle">Tableau de bord</p>
+    </div>
+    <div style="width:100%;max-width:800px;">
+      <button class="back-btn" onclick="showPage('page-accueil')">← Accueil</button>
+
+      <div class="prof-tabs">
+        <button class="prof-tab active" onclick="switchProfTab('tab-code')">🔑 Code élève</button>
+        <button class="prof-tab" onclick="switchProfTab('tab-eleves')">📊 Élèves</button>
+        <button class="prof-tab" onclick="switchProfTab('tab-ajout')">➕ Exercices</button>
+        <button class="prof-tab" onclick="switchProfTab('tab-reset')">🗑️ Reset</button>
+      </div>
+
+      <!-- TAB : Code élève -->
+      <div class="tab-content active" id="tab-code">
+        <div class="card" style="max-width:100%;">
+          <p class="card-title">🔑 Code d'accès élève</p>
+          <div class="msg-box msg-info" id="code-actuel-display">Aucun code défini</div>
+          <div class="input-group" style="margin-top:16px;">
+            <label>Nouveau code (4-8 caractères)</label>
+            <input class="mario-input" type="text" id="new-eleve-code" placeholder="ex: MARIO" maxlength="8" />
+          </div>
+          <div class="msg-box msg-success" id="code-save-ok">✅ Code enregistré !</div>
+          <button class="btn btn-green btn-full" onclick="saveEleveCode()">Enregistrer 💾</button>
+        </div>
+      </div>
+
+      <!-- TAB : Élèves -->
+      <div class="tab-content" id="tab-eleves">
+        <div class="card" style="max-width:100%;">
+          <p class="card-title">📊 Suivi des élèves</p>
+          <div id="eleves-list">
+            <p style="color:#666;font-size:0.85rem;text-align:center;">Aucun élève enregistré sur cet appareil.</p>
+          </div>
+          <div style="margin-top:16px;">
+            <button class="btn btn-blue btn-sm" onclick="window.print()">🖨️ Imprimer</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB : Ajout exercices -->
+      <div class="tab-content" id="tab-ajout">
+        <div class="card" style="max-width:100%;">
+          <p class="card-title">➕ Ajouter des exercices</p>
+
+          <!-- Méthode A : IA -->
+          <div style="margin-bottom:24px;">
+            <p style="font-family:'Press Start 2P',monospace;font-size:0.55rem;color:var(--mario-blue);margin-bottom:12px;">
+              Méthode A – Génération par IA (Claude API)
+            </p>
+            <div class="input-group">
+              <label>Clé API Claude (sk-ant-...)</label>
+              <input class="mario-input" type="password" id="api-key-input" placeholder="sk-ant-api03-..." style="letter-spacing:1px;" />
+              <button class="btn btn-sm btn-outline" style="margin-top:6px;" onclick="saveApiKey()">💾 Sauvegarder la clé</button>
+            </div>
+            <div class="input-group">
+              <label>Instructions pour les exercices</label>
+              <textarea class="json-area" id="ia-instructions" rows="7" placeholder="Exemple :
+Thème : Present perfect, forme affirmative
+Lexique : les voyages
+Niveau : 1
+Type : QCM
+Nombre de phrases : 15"></textarea>
+            </div>
+            <div class="msg-box msg-info" id="ia-msg"></div>
+            <button class="btn btn-yellow btn-full" onclick="generateWithIA()">✨ Générer avec l'IA</button>
+          </div>
+
+          <div class="section-sep"></div>
+
+          <!-- Méthode B : JSON manuel -->
+          <div>
+            <p style="font-family:'Press Start 2P',monospace;font-size:0.55rem;color:var(--mario-green);margin-bottom:12px;">
+              Méthode B – Import JSON manuel
+            </p>
+            <div class="input-group">
+              <label>Coller le JSON des exercices ici</label>
+              <textarea class="json-area" id="json-import" rows="8" placeholder='{ "id": "...", "title": "...", ... }'></textarea>
+            </div>
+            <div class="msg-box msg-error" id="json-import-error"></div>
+            <div class="msg-box msg-success" id="json-import-ok"></div>
+            <button class="btn btn-green btn-full" onclick="importJSON()">📥 Valider et intégrer</button>
+            <details style="margin-top:16px;">
+              <summary style="cursor:pointer;color:#aaa;font-size:0.85rem;font-weight:700;">📖 Voir le format JSON attendu</summary>
+              <div class="format-hint" id="json-format-hint"></div>
+            </details>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB : Reset -->
+      <div class="tab-content" id="tab-reset">
+        <div class="card" style="max-width:100%;">
+          <p class="card-title">🗑️ Réinitialisation</p>
+          <div style="display:flex;flex-direction:column;gap:14px;">
+            <div>
+              <p style="color:#aaa;font-size:0.85rem;margin-bottom:10px;">Réinitialiser un élève spécifique :</p>
+              <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                <input class="mario-input" type="text" id="reset-eleve-id" placeholder="ex: CAME_CVA" style="flex:1;min-width:150px;" />
+                <button class="btn btn-red btn-sm" onclick="resetEleve()">Supprimer</button>
+              </div>
+            </div>
+            <div class="section-sep"></div>
+            <div>
+              <p style="color:#ff8080;font-size:0.85rem;margin-bottom:10px;">⚠️ Supprimer TOUTES les données élèves :</p>
+              <button class="btn btn-red btn-full" onclick="resetAll()">🗑️ Tout réinitialiser</button>
+            </div>
+          </div>
+          <div class="msg-box msg-success" id="reset-ok" style="margin-top:12px;"></div>
+        </div>
+      </div>
+
+    </div>
+    <footer>Créé par C. Iemfre <a href="#" onclick="showPage('page-rgpd');return false;">RGPD</a></footer>
+  </div>
+
+  <!-- ===================== PAGE : LOGIN ÉLÈVE ===================== -->
+  <div class="page" id="page-login-eleve">
+    <div class="mario-header">
+      <h1>🎮 GRAMY</h1>
+      <p class="subtitle">Entrez votre code d'accès</p>
+    </div>
+    <div class="card">
+      <div class="input-group">
+        <label>Code d'accès</label>
+        <input class="mario-input" type="text" id="eleve-code-input" placeholder="CODE" maxlength="10"
+          style="text-transform:uppercase;"
+          onkeydown="if(event.key==='Enter')checkEleveCode()" />
+      </div>
+      <div class="msg-box msg-error" id="eleve-code-error"></div>
+      <div style="display:flex;gap:12px;margin-top:8px;">
+        <button class="btn btn-gray btn-full" onclick="showPage('page-accueil')">← Retour</button>
+        <button class="btn btn-yellow btn-full" onclick="checkEleveCode()">Entrer 🍄</button>
+      </div>
+    </div>
+    <footer>Créé par C. Iemfre <a href="#" onclick="showPage('page-rgpd');return false;">RGPD</a></footer>
+  </div>
+
+  <!-- ===================== PAGE : IDENTIFICATION ÉLÈVE ===================== -->
+  <div class="page" id="page-identification">
+    <div class="mario-header">
+      <h1>🎮 QUI ES-TU ?</h1>
+      <p class="subtitle">Identifie-toi pour commencer</p>
+    </div>
+    <div class="card">
+      <p class="card-title">📋 Mon identification</p>
+      <div class="two-cols">
+        <div class="input-group">
+          <label>2 premières lettres<br>du PRÉNOM</label>
+          <input class="mario-input" type="text" id="id-prenom" placeholder="ex: CA" maxlength="2"
+            style="text-transform:uppercase;text-align:center;" oninput="this.value=this.value.toUpperCase()" />
+        </div>
+        <div class="input-group">
+          <label>2 premières lettres<br>du NOM</label>
+          <input class="mario-input" type="text" id="id-nom" placeholder="ex: MA" maxlength="2"
+            style="text-transform:uppercase;text-align:center;" oninput="this.value=this.value.toUpperCase()" />
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Classe</label>
+        <input class="mario-input" type="text" id="id-classe" placeholder="ex: CVA, AEPA..." maxlength="10"
+          style="text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()" />
+      </div>
+      <div class="msg-box msg-error" id="id-error"></div>
+      <button class="btn btn-yellow btn-full btn-lg" onclick="identifierEleve()">C'est parti ! 🚀</button>
+    </div>
+    <footer>Créé par C. Iemfre <a href="#" onclick="showPage('page-rgpd');return false;">RGPD</a></footer>
+  </div>
+
+  <!-- ===================== PAGE : DASHBOARD ÉLÈVE ===================== -->
+  <div class="page" id="page-dashboard">
+    <div style="width:100%;max-width:1000px;padding-bottom:20px;">
+      <div class="eleve-header">
+        <div>
+          <div class="eleve-id" id="dash-eleve-id">-- --</div>
+          <div style="font-size:0.8rem;color:#aaa;margin-top:4px;" id="dash-eleve-classe"></div>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+          <button class="btn btn-blue btn-sm" onclick="showBilan()">📄 Ma Fiche Bilan</button>
+          <button class="btn btn-outline btn-sm" onclick="deconnecterEleve()">Déconnexion</button>
+        </div>
+      </div>
+
+      <!-- XP global -->
+      <div style="margin:16px 0;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+          <span style="font-family:'Press Start 2P',monospace;font-size:0.5rem;color:var(--mario-yellow);">⭐ PROGRESSION GLOBALE</span>
+          <span style="font-family:'Press Start 2P',monospace;font-size:0.5rem;color:var(--mario-green);" id="dash-xp-text">0%</span>
+        </div>
+        <div class="xp-bar-wrap">
+          <div class="xp-bar-fill" id="dash-xp-bar" style="width:0%"></div>
+        </div>
+      </div>
+
+      <p style="font-family:'Press Start 2P',monospace;font-size:0.6rem;color:var(--mario-yellow);margin:20px 0 12px;">
+        🗺️ CHOISIS TON THÈME
+      </p>
+
+      <div class="themes-grid" id="themes-grid">
+        <!-- Généré par JS -->
+      </div>
+    </div>
+    <footer>Créé par C. Iemfre <a href="#" onclick="showPage('page-rgpd');return false;">RGPD</a></footer>
+  </div>
+
+  <!-- ===================== PAGE : THÈME (niveaux) ===================== -->
+  <div class="page" id="page-theme">
+    <div style="width:100%;max-width:900px;">
+      <button class="back-btn" onclick="showPage('page-dashboard');refreshDashboard()">← Retour</button>
+      <div class="mario-header" style="padding-top:0;">
+        <h1 id="theme-page-title" style="font-size:clamp(0.7rem,2vw,1.2rem);">THÈME</h1>
+        <p class="subtitle" id="theme-page-lexique"></p>
+      </div>
+      <p style="text-align:center;color:#aaa;font-size:0.85rem;margin:16px 0 24px;">
+        Complète les niveaux dans l'ordre. Niveau validé = tous les exercices faits !
+      </p>
+      <div class="levels-container" id="levels-container">
+        <!-- Généré par JS -->
+      </div>
+    </div>
+    <footer>Créé par C. Iemfre <a href="#" onclick="showPage('page-rgpd');return false;">RGPD</a></footer>
+  </div>
+
+  <!-- ===================== PAGE : EXERCICE ===================== -->
+  <div class="page" id="page-exercice">
+    <div class="exercise-wrap">
+      <button class="back-btn" onclick="confirmLeaveExercise()">← Quitter l'exercice</button>
+      <div class="exercise-header">
+        <div>
+          <div style="font-family:'Press Start 2P',monospace;font-size:0.5rem;color:#aaa;" id="ex-theme-label"></div>
+          <div class="ex-progress" id="ex-progress-label">Question 1/15</div>
+        </div>
+        <div class="ex-score-live" id="ex-score-live">🪙 0 pts</div>
+      </div>
+      <div class="xp-bar-wrap" style="margin-bottom:20px;">
+        <div class="xp-bar-fill" id="ex-progress-bar" style="width:0%"></div>
+      </div>
+      <div id="ex-question-area">
+        <!-- Généré par JS selon le type -->
+      </div>
+      <div style="display:flex;gap:12px;margin-top:16px;flex-wrap:wrap;" id="ex-action-btns">
+        <button class="btn btn-yellow btn-full" id="btn-valider" onclick="validerReponse()">Valider ✅</button>
+        <button class="btn btn-blue btn-full" id="btn-suivant" onclick="questionSuivante()" style="display:none;">Suivant ➡️</button>
+      </div>
+    </div>
+    <footer>Créé par C. Iemfre <a href="#" onclick="showPage('page-rgpd');return false;">RGPD</a></footer>
+  </div>
+
+  <!-- ===================== PAGE : SCORE FINAL ===================== -->
+  <div class="page" id="page-score">
+    <div class="score-result">
+      <button class="back-btn" onclick="retourTheme()" style="justify-content:center;">← Retour au thème</button>
+      <div style="font-size:3rem;" id="score-emoji">🏆</div>
+      <div class="score-big" id="score-fraction" style="color:var(--mario-yellow);">12/15</div>
+      <div class="score-stars" id="score-stars">⭐⭐⭐</div>
+      <div class="score-msg" id="score-msg">Excellent !</div>
+
+      <!-- Boîte "réessayer" si < 50% -->
+      <div class="retry-box" id="retry-box">
+        <div class="retry-box-msg" id="retry-msg">Oups ! Tu as moins de 50%...<br>Mario te propose de retenter ta chance ! 🍄</div>
+        <div class="retry-btns">
+          <button class="btn btn-red" onclick="retryExercise()">🔄 Réessayer</button>
+          <button class="btn btn-gray" onclick="retourTheme()">➡️ Continuer quand même</button>
+        </div>
+      </div>
+
+      <!-- Corrections détail -->
+      <details style="width:100%;margin-top:20px;" open>
+        <summary style="cursor:pointer;font-family:'Press Start 2P',monospace;font-size:0.6rem;color:var(--mario-blue);padding:10px 0;">
+          📖 Voir les corrections détaillées
+        </summary>
+        <div class="corrections-list" id="corrections-detail" style="margin-top:14px;">
+          <!-- Généré par JS -->
+        </div>
+      </details>
+
+      <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:20px;">
+        <button class="btn btn-outline btn-sm" onclick="retryExercise()">🔄 Refaire</button>
+        <button class="btn btn-blue" onclick="retourTheme()">🗺️ Retour thème</button>
+        <button class="btn btn-green" onclick="showBilan()">📄 Fiche Bilan</button>
+      </div>
+    </div>
+    <footer>Créé par C. Iemfre <a href="#" onclick="showPage('page-rgpd');return false;">RGPD</a></footer>
+  </div>
+
+  <!-- ===================== PAGE : FICHE BILAN ===================== -->
+  <div class="page" id="page-bilan">
+    <div style="width:100%;max-width:750px;">
+      <div class="print-header" style="text-align:center;margin-bottom:20px;">
+        <h1 style="font-size:1.5rem;font-weight:900;">GRAMY – Fiche Bilan</h1>
+        <p id="bilan-print-header"></p>
+      </div>
+      <div class="no-print" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:20px;">
+        <button class="back-btn" onclick="showPage('page-dashboard');refreshDashboard()" style="margin-bottom:0;">← Retour</button>
+        <div>
+          <div class="eleve-id" id="bilan-eleve-id"></div>
+          <div style="font-size:0.8rem;color:#aaa;" id="bilan-eleve-classe"></div>
+        </div>
+        <button class="btn btn-yellow btn-sm" onclick="window.print()">🖨️ Imprimer PDF</button>
+      </div>
+
+      <div id="bilan-content">
+        <!-- Généré par JS -->
+      </div>
+
+      <div class="bilan-section no-print" style="text-align:center;">
+        <p style="color:#666;font-size:0.8rem;">Créé par C. Iemfre – GRAMY – Grammaire Anglaise Terminale Bac Pro</p>
+      </div>
+    </div>
+    <footer class="no-print">Créé par C. Iemfre <a href="#" onclick="showPage('page-rgpd');return false;">RGPD</a></footer>
+  </div>
+
+</div><!-- fin app-container -->
+
+<!-- 
+<script>
+// ============================================================
+//  GRAMY – EXERCISES_DATA
+//  6 thèmes × 4 niveaux = 24 sets d'exercices
+// ============================================================
+
+const EXERCISES_DATA = {
+  themes: [
+
+    // ════════════════════════════════════════════════════════
+    // THÈME 1 : PRÉSENT SIMPLE – FORME AFFIRMATIVE
+    // Lexique : Les entreprises
+    // ════════════════════════════════════════════════════════
+    {
+      id: "present-simple-affirmatif",
+      title: "Présent simple – Affirmative",
+      titleFull: "Présent simple – Forme affirmative",
+      lexique: "Les entreprises",
+      niveaux: [
+        {
+          niveau: 1, type: "qcm", label: "QCM", total: 15,
+          exercices: [
+            { id:"ps-af-1-1", phrase:"The manager ___ the weekly meetings.", options:["organise","organises","organising","organised"], correct:1, explication:"Avec he/she/it, on ajoute -s au verbe. ✅ The manager organises. ❌ The manager organise." },
+            { id:"ps-af-1-2", phrase:"Our company ___ products to 30 countries.", options:["export","exports","exporting","exported"], correct:1, explication:"Our company = it → verbe + s. ✅ exports." },
+            { id:"ps-af-1-3", phrase:"The employees ___ hard every day.", options:["works","working","work","worked"], correct:2, explication:"The employees = they (pluriel) → pas de -s. ✅ work." },
+            { id:"ps-af-1-4", phrase:"She ___ the financial reports every month.", options:["check","checks","checking","checked"], correct:1, explication:"She → verbe + s. ✅ checks." },
+            { id:"ps-af-1-5", phrase:"The factory ___ 500 units per day.", options:["produce","producing","produces","produced"], correct:2, explication:"The factory = it → produces. Attention : produce → produces (e final conservé + s). ✅ produces." },
+            { id:"ps-af-1-6", phrase:"Our CEO ___ important decisions.", options:["makes","make","making","maked"], correct:0, explication:"Our CEO = he/she → make + s = makes. ✅ makes." },
+            { id:"ps-af-1-7", phrase:"The sales team ___ new clients every week.", options:["find","finded","finding","finds"], correct:3, explication:"The sales team = it → finds. ✅ finds. ❌ finded n'existe pas." },
+            { id:"ps-af-1-8", phrase:"We ___ our suppliers on a regular basis.", options:["contacts","contacting","contact","contacted"], correct:2, explication:"We = pluriel → pas de -s. ✅ contact." },
+            { id:"ps-af-1-9", phrase:"The secretary ___ all incoming calls.", options:["answer","answers","answering","answered"], correct:1, explication:"The secretary = she → answers. ✅ answers." },
+            { id:"ps-af-1-10", phrase:"Our partners ___ in several European countries.", options:["operates","operating","operate","operated"], correct:2, explication:"Our partners = they → pas de -s. ✅ operate." },
+            { id:"ps-af-1-11", phrase:"The branch ___ at 8 a.m. every morning.", options:["open","opening","opened","opens"], correct:3, explication:"The branch = it → opens. ✅ opens." },
+            { id:"ps-af-1-12", phrase:"She ___ the invoices every Friday.", options:["sends","send","sended","sending"], correct:0, explication:"She → send + s = sends. ✅ sends. ❌ sended n'existe pas, c'est sent au prétérit." },
+            { id:"ps-af-1-13", phrase:"The board ___ twice a year.", options:["meet","meets","meeting","meted"], correct:1, explication:"The board = it → meets. ✅ meets." },
+            { id:"ps-af-1-14", phrase:"I ___ the stock levels every morning.", options:["checks","checking","check","checked"], correct:2, explication:"I → pas de -s, jamais. ✅ check." },
+            { id:"ps-af-1-15", phrase:"The HR department ___ all new staff.", options:["train","trains","training","trained"], correct:1, explication:"The HR department = it → trains. ✅ trains." }
+          ]
+        },
+        {
+          niveau: 2, type: "trous", label: "Phrases à trous", total: 15,
+          exercices: [
+            { id:"ps-af-2-1", phrase:"The director ___ (sign) all official documents.", correct:"signs", explication:"The director = he/she → sign + s. ✅ signs." },
+            { id:"ps-af-2-2", phrase:"Our accountant ___ (prepare) the annual budget.", correct:"prepares", explication:"Our accountant = he/she → prepare + s. ✅ prepares." },
+            { id:"ps-af-2-3", phrase:"The company ___ (offer) competitive salaries.", correct:"offers", explication:"The company = it → offer + s. ✅ offers." },
+            { id:"ps-af-2-4", phrase:"The IT team ___ (manage) all the software.", correct:"manages", explication:"The IT team = it → manage + s (e final + s). ✅ manages." },
+            { id:"ps-af-2-5", phrase:"She ___ (attend) every board meeting.", correct:"attends", explication:"She → attend + s. ✅ attends." },
+            { id:"ps-af-2-6", phrase:"Our firm ___ (employ) over 200 people.", correct:"employs", explication:"Our firm = it → employ + s. ✅ employs." },
+            { id:"ps-af-2-7", phrase:"The logistics team ___ (handle) all deliveries.", correct:"handles", explication:"The logistics team = it → handle + s. ✅ handles." },
+            { id:"ps-af-2-8", phrase:"He ___ (represent) the company at trade fairs.", correct:"represents", explication:"He → represent + s. ✅ represents." },
+            { id:"ps-af-2-9", phrase:"The brand ___ (target) young professionals.", correct:"targets", explication:"The brand = it → target + s. ✅ targets." },
+            { id:"ps-af-2-10", phrase:"The warehouse ___ (store) thousands of items.", correct:"stores", explication:"The warehouse = it → store + s. ✅ stores." },
+            { id:"ps-af-2-11", phrase:"Our shareholders ___ (expect) good results.", correct:"expect", explication:"Our shareholders = they → pas de -s. ✅ expect." },
+            { id:"ps-af-2-12", phrase:"She ___ (supervise) the production line.", correct:"supervises", explication:"She → supervise + s. ✅ supervises." },
+            { id:"ps-af-2-13", phrase:"The marketing department ___ (launch) new campaigns.", correct:"launches", explication:"The marketing department = it → launch → launches (-es après ch). ✅ launches." },
+            { id:"ps-af-2-14", phrase:"He ___ (analyse) market trends regularly.", correct:"analyses", explication:"He → analyse + s. ✅ analyses." },
+            { id:"ps-af-2-15", phrase:"Our team ___ (deliver) results on time.", correct:"delivers", explication:"Our team = it → deliver + s. ✅ delivers." }
+          ]
+        },
+        {
+          niveau: 3, type: "ordre", label: "Remettre dans l'ordre", total: 10,
+          exercices: [
+            { id:"ps-af-3-1", mots:["every","The","invoices","accountant","checks","week"], correct:"The accountant checks invoices every week.", explication:"Structure : Sujet + Verbe(-s) + COD + Fréquence." },
+            { id:"ps-af-3-2", mots:["sales","annually","Our","figures","increases","company"], correct:"Our company increases sales figures annually.", explication:"Structure : Sujet + Verbe(-s) + COD + Adverbe." },
+            { id:"ps-af-3-3", mots:["partners","cooperates","with","The","firm","international"], correct:"The firm cooperates with international partners.", explication:"Structure : Sujet + Verbe(-s) + Préposition + COD." },
+            { id:"ps-af-3-4", mots:["new","recruits","The","staff","HR","department"], correct:"The HR department recruits new staff.", explication:"Structure : Sujet + Verbe(-s) + Adjectif + COD." },
+            { id:"ps-af-3-5", mots:["She","monthly","the","updates","database"], correct:"She updates the database monthly.", explication:"Structure : Sujet + Verbe(-s) + COD + Adverbe de fréquence." },
+            { id:"ps-af-3-6", mots:["trade","attends","He","fairs","international"], correct:"He attends international trade fairs.", explication:"Structure : Sujet + Verbe(-s) + Adjectif + COD." },
+            { id:"ps-af-3-7", mots:["products","The","worldwide","company","distributes"], correct:"The company distributes products worldwide.", explication:"Structure : Sujet + Verbe(-s) + COD + Adverbe." },
+            { id:"ps-af-3-8", mots:["The","the","manages","director","budget","annual"], correct:"The director manages the annual budget.", explication:"Structure : Sujet + Verbe(-s) + Déterminant + Adjectif + COD." },
+            { id:"ps-af-3-9", mots:["quality","controls","team","The","production"], correct:"The team controls production quality.", explication:"Structure : Sujet + Verbe(-s) + COD + COD2." },
+            { id:"ps-af-3-10", mots:["Our","excellent","provides","service","company","customer"], correct:"Our company provides excellent customer service.", explication:"Structure : Sujet + Verbe(-s) + Adjectif + COD composé." }
+          ]
+        },
+        {
+          niveau: 4, type: "erreur", label: "Trouver l'erreur", total: 15,
+          exercices: [
+            { id:"ps-af-4-1", phrase:"The manager organise the meetings.", estCorrecte:false, correction:"The manager organises the meetings.", explication:"The manager = he/she → organise + s. ✅ organises." },
+            { id:"ps-af-4-2", phrase:"Our employees work from home twice a week.", estCorrecte:true, correction:null, explication:"Our employees = they → work (sans -s). ✅ Phrase correcte." },
+            { id:"ps-af-4-3", phrase:"She sign the contracts every Monday.", estCorrecte:false, correction:"She signs the contracts every Monday.", explication:"She → sign + s. ✅ signs." },
+            { id:"ps-af-4-4", phrase:"The company exports goods to Asia.", estCorrecte:true, correction:null, explication:"The company = it → exports. ✅ Phrase correcte." },
+            { id:"ps-af-4-5", phrase:"He manage a team of ten people.", estCorrecte:false, correction:"He manages a team of ten people.", explication:"He → manage + s. ✅ manages." },
+            { id:"ps-af-4-6", phrase:"The directors approve the annual report.", estCorrecte:true, correction:null, explication:"The directors = they → approve (sans -s). ✅ Phrase correcte." },
+            { id:"ps-af-4-7", phrase:"Our firm employ over 300 staff members.", estCorrecte:false, correction:"Our firm employs over 300 staff members.", explication:"Our firm = it → employ + s. ✅ employs." },
+            { id:"ps-af-4-8", phrase:"The secretary answers all the emails.", estCorrecte:true, correction:null, explication:"The secretary = she → answers. ✅ Phrase correcte." },
+            { id:"ps-af-4-9", phrase:"We delivers the orders on time.", estCorrecte:false, correction:"We deliver the orders on time.", explication:"We = pluriel → pas de -s. ✅ deliver." },
+            { id:"ps-af-4-10", phrase:"The brand targets young consumers.", estCorrecte:true, correction:null, explication:"The brand = it → targets. ✅ Phrase correcte." },
+            { id:"ps-af-4-11", phrase:"I checks the stock every morning.", estCorrecte:false, correction:"I check the stock every morning.", explication:"I → jamais de -s. ✅ check." },
+            { id:"ps-af-4-12", phrase:"The factory produces 1000 units daily.", estCorrecte:true, correction:null, explication:"The factory = it → produces. ✅ Phrase correcte." },
+            { id:"ps-af-4-13", phrase:"She prepare the monthly reports.", estCorrecte:false, correction:"She prepares the monthly reports.", explication:"She → prepare + s. ✅ prepares." },
+            { id:"ps-af-4-14", phrase:"They negotiate new contracts each quarter.", estCorrecte:true, correction:null, explication:"They = pluriel → negotiate (sans -s). ✅ Phrase correcte." },
+            { id:"ps-af-4-15", phrase:"The CEO takes all the final decisions.", estCorrecte:true, correction:null, explication:"The CEO = he/she → takes. ✅ Phrase correcte." }
+          ]
+        }
+      ]
+    },
+
+    // ════════════════════════════════════════════════════════
+    // THÈME 2 : PRÉSENT SIMPLE – FORME NÉGATIVE
+    // Lexique : Les projets
+    // ════════════════════════════════════════════════════════
+    {
+      id: "present-simple-negatif",
+      title: "Présent simple – Négative",
+      titleFull: "Présent simple – Forme négative",
+      lexique: "Les projets",
+      niveaux: [
+        {
+          niveau: 1, type: "qcm", label: "QCM", total: 15,
+          exercices: [
+            { id:"ps-ng-1-1", phrase:"The team ___ the deadline.", options:["don't meet","doesn't meets","doesn't meet","not meet"], correct:2, explication:"The team = he/she/it → doesn't + verbe BASE (sans -s). ✅ doesn't meet. ❌ doesn't meets est faux." },
+            { id:"ps-ng-1-2", phrase:"We ___ enough resources for this project.", options:["doesn't have","don't has","don't have","not have"], correct:2, explication:"We → don't + base verbale. ✅ don't have." },
+            { id:"ps-ng-1-3", phrase:"She ___ the project manager.", options:["don't know","doesn't knows","not knows","doesn't know"], correct:3, explication:"She → doesn't + base (know, sans -s). ✅ doesn't know." },
+            { id:"ps-ng-1-4", phrase:"They ___ the budget on time.", options:["doesn't submit","don't submits","don't submit","not submit"], correct:2, explication:"They → don't + base. ✅ don't submit." },
+            { id:"ps-ng-1-5", phrase:"He ___ to the weekly briefing.", options:["don't come","doesn't comes","doesn't come","not comes"], correct:2, explication:"He → doesn't + come (base). ✅ doesn't come." },
+            { id:"ps-ng-1-6", phrase:"The project ___ on schedule.", options:["don't progress","doesn't progresses","doesn't progress","not progress"], correct:2, explication:"The project = it → doesn't + progress (base). ✅ doesn't progress." },
+            { id:"ps-ng-1-7", phrase:"I ___ with this approach.", options:["doesn't agree","don't agrees","don't agree","not agree"], correct:2, explication:"I → don't + base. ✅ don't agree." },
+            { id:"ps-ng-1-8", phrase:"The client ___ our proposal.", options:["don't like","doesn't likes","doesn't like","not like"], correct:2, explication:"The client = he/she → doesn't + like (base). ✅ doesn't like." },
+            { id:"ps-ng-1-9", phrase:"Our partners ___ the new plan.", options:["doesn't support","don't supports","don't support","not support"], correct:2, explication:"Our partners = they → don't + support (base). ✅ don't support." },
+            { id:"ps-ng-1-10", phrase:"She ___ the risk assessment.", options:["don't complete","doesn't completes","doesn't complete","not complete"], correct:2, explication:"She → doesn't + complete (base). ✅ doesn't complete." },
+            { id:"ps-ng-1-11", phrase:"The manager ___ overtime.", options:["don't allow","doesn't allows","doesn't allow","not allows"], correct:2, explication:"The manager = he/she → doesn't + allow. ✅ doesn't allow." },
+            { id:"ps-ng-1-12", phrase:"We ___ any problems with the timeline.", options:["doesn't anticipate","don't anticipates","don't anticipate","not anticipate"], correct:2, explication:"We → don't + anticipate (base). ✅ don't anticipate." },
+            { id:"ps-ng-1-13", phrase:"He ___ the progress report.", options:["don't write","doesn't writes","doesn't write","not writes"], correct:2, explication:"He → doesn't + write (base). ✅ doesn't write." },
+            { id:"ps-ng-1-14", phrase:"The stakeholders ___ our decision.", options:["doesn't understand","don't understands","don't understand","not understand"], correct:2, explication:"The stakeholders = they → don't + understand. ✅ don't understand." },
+            { id:"ps-ng-1-15", phrase:"It ___ many resources.", options:["don't require","doesn't requires","doesn't require","not require"], correct:2, explication:"It → doesn't + require (base). ✅ doesn't require." }
+          ]
+        },
+        {
+          niveau: 2, type: "trous", label: "Phrases à trous", total: 15,
+          exercices: [
+            { id:"ps-ng-2-1", phrase:"The project leader ___ ___ (not/follow) the original plan.", correct:"doesn't follow", explication:"The project leader = he/she → doesn't + follow (base). ✅ doesn't follow." },
+            { id:"ps-ng-2-2", phrase:"We ___ ___ (not/have) enough time to finish.", correct:"don't have", explication:"We → don't + have. ✅ don't have." },
+            { id:"ps-ng-2-3", phrase:"She ___ ___ (not/attend) the kick-off meeting.", correct:"doesn't attend", explication:"She → doesn't + attend. ✅ doesn't attend." },
+            { id:"ps-ng-2-4", phrase:"The budget ___ ___ (not/cover) all expenses.", correct:"doesn't cover", explication:"The budget = it → doesn't + cover. ✅ doesn't cover." },
+            { id:"ps-ng-2-5", phrase:"They ___ ___ (not/respect) the deadlines.", correct:"don't respect", explication:"They → don't + respect. ✅ don't respect." },
+            { id:"ps-ng-2-6", phrase:"He ___ ___ (not/communicate) with the team regularly.", correct:"doesn't communicate", explication:"He → doesn't + communicate. ✅ doesn't communicate." },
+            { id:"ps-ng-2-7", phrase:"The client ___ ___ (not/validate) the deliverables.", correct:"doesn't validate", explication:"The client = he/she → doesn't + validate. ✅ doesn't validate." },
+            { id:"ps-ng-2-8", phrase:"I ___ ___ (not/understand) the new requirements.", correct:"don't understand", explication:"I → don't + understand. ✅ don't understand." },
+            { id:"ps-ng-2-9", phrase:"The IT team ___ ___ (not/provide) enough support.", correct:"doesn't provide", explication:"The IT team = it → doesn't + provide. ✅ doesn't provide." },
+            { id:"ps-ng-2-10", phrase:"Our investors ___ ___ (not/approve) the new direction.", correct:"don't approve", explication:"Our investors = they → don't + approve. ✅ don't approve." },
+            { id:"ps-ng-2-11", phrase:"She ___ ___ (not/manage) the risks properly.", correct:"doesn't manage", explication:"She → doesn't + manage. ✅ doesn't manage." },
+            { id:"ps-ng-2-12", phrase:"The company ___ ___ (not/invest) in this project.", correct:"doesn't invest", explication:"The company = it → doesn't + invest. ✅ doesn't invest." },
+            { id:"ps-ng-2-13", phrase:"We ___ ___ (not/need) extra staff.", correct:"don't need", explication:"We → don't + need. ✅ don't need." },
+            { id:"ps-ng-2-14", phrase:"He ___ ___ (not/report) to the director directly.", correct:"doesn't report", explication:"He → doesn't + report. ✅ doesn't report." },
+            { id:"ps-ng-2-15", phrase:"The schedule ___ ___ (not/allow) for delays.", correct:"doesn't allow", explication:"The schedule = it → doesn't + allow. ✅ doesn't allow." }
+          ]
+        },
+        {
+          niveau: 3, type: "ordre", label: "Remettre dans l'ordre", total: 10,
+          exercices: [
+            { id:"ps-ng-3-1", mots:["meet","The","doesn't","deadline","team","the"], correct:"The team doesn't meet the deadline.", explication:"Négation : Sujet + doesn't + base verbale + COD." },
+            { id:"ps-ng-3-2", mots:["don't","the","We","budget","respect"], correct:"We don't respect the budget.", explication:"Négation avec we : don't + base verbale." },
+            { id:"ps-ng-3-3", mots:["She","the","doesn't","progress","track"], correct:"She doesn't track the progress.", explication:"She → doesn't + track (base)." },
+            { id:"ps-ng-3-4", mots:["the","doesn't","plan","manager","follow","The"], correct:"The manager doesn't follow the plan.", explication:"The manager = he/she → doesn't + follow." },
+            { id:"ps-ng-3-5", mots:["don't","extra","They","resources","need"], correct:"They don't need extra resources.", explication:"They → don't + need + adjectif + COD." },
+            { id:"ps-ng-3-6", mots:["He","the","communicate","doesn't","with","stakeholders"], correct:"He doesn't communicate with the stakeholders.", explication:"He → doesn't + communicate + with + COD." },
+            { id:"ps-ng-3-7", mots:["project","doesn't","schedule","The","on","progress"], correct:"The project doesn't progress on schedule.", explication:"The project = it → doesn't + progress + complément." },
+            { id:"ps-ng-3-8", mots:["don't","I","to","agree","this","approach"], correct:"I don't agree to this approach.", explication:"I → don't + agree + to + COD." },
+            { id:"ps-ng-3-9", mots:["validate","client","doesn't","deliverables","The","the"], correct:"The client doesn't validate the deliverables.", explication:"The client = he/she → doesn't + validate." },
+            { id:"ps-ng-3-10", mots:["Our","invest","project","don't","in","investors","this"], correct:"Our investors don't invest in this project.", explication:"Our investors = they → don't + invest + in + COD." }
+          ]
+        },
+        {
+          niveau: 4, type: "erreur", label: "Trouver l'erreur", total: 15,
+          exercices: [
+            { id:"ps-ng-4-1", phrase:"She doesn't knows the project manager.", estCorrecte:false, correction:"She doesn't know the project manager.", explication:"Après doesn't, le verbe est à la BASE (sans -s). ✅ doesn't know." },
+            { id:"ps-ng-4-2", phrase:"We don't have enough resources.", estCorrecte:true, correction:null, explication:"We + don't + base verbale. ✅ Phrase correcte." },
+            { id:"ps-ng-4-3", phrase:"He don't attend the meetings.", estCorrecte:false, correction:"He doesn't attend the meetings.", explication:"He/she/it → doesn't (pas don't). ✅ He doesn't attend." },
+            { id:"ps-ng-4-4", phrase:"The project doesn't require many staff.", estCorrecte:true, correction:null, explication:"The project = it → doesn't + require (base). ✅ Phrase correcte." },
+            { id:"ps-ng-4-5", phrase:"They doesn't respect the schedule.", estCorrecte:false, correction:"They don't respect the schedule.", explication:"They = pluriel → don't (pas doesn't). ✅ They don't respect." },
+            { id:"ps-ng-4-6", phrase:"She doesn't manage the risks properly.", estCorrecte:true, correction:null, explication:"She → doesn't + manage (base). ✅ Phrase correcte." },
+            { id:"ps-ng-4-7", phrase:"The budget don't cover all expenses.", estCorrecte:false, correction:"The budget doesn't cover all expenses.", explication:"The budget = it → doesn't (pas don't). ✅ doesn't cover." },
+            { id:"ps-ng-4-8", phrase:"I don't understand the new plan.", estCorrecte:true, correction:null, explication:"I + don't + base. ✅ Phrase correcte." },
+            { id:"ps-ng-4-9", phrase:"He doesn't reports to the director.", estCorrecte:false, correction:"He doesn't report to the director.", explication:"Après doesn't, base verbale SANS -s. ✅ doesn't report." },
+            { id:"ps-ng-4-10", phrase:"Our partners don't support this initiative.", estCorrecte:true, correction:null, explication:"Our partners = they → don't + support. ✅ Phrase correcte." },
+            { id:"ps-ng-4-11", phrase:"The client not validate the deliverables.", estCorrecte:false, correction:"The client doesn't validate the deliverables.", explication:"On ne peut pas mettre 'not' seul. Il faut doesn't + base. ✅ doesn't validate." },
+            { id:"ps-ng-4-12", phrase:"We don't need extra funding.", estCorrecte:true, correction:null, explication:"We → don't + need. ✅ Phrase correcte." },
+            { id:"ps-ng-4-13", phrase:"She don't communicate with the team.", estCorrecte:false, correction:"She doesn't communicate with the team.", explication:"She → doesn't (pas don't). ✅ She doesn't communicate." },
+            { id:"ps-ng-4-14", phrase:"The schedule doesn't allow for delays.", estCorrecte:true, correction:null, explication:"The schedule = it → doesn't + allow (base). ✅ Phrase correcte." },
+            { id:"ps-ng-4-15", phrase:"They don't invest in new technology.", estCorrecte:true, correction:null, explication:"They → don't + invest. ✅ Phrase correcte." }
+          ]
+        }
+      ]
+    },
+
+    // ════════════════════════════════════════════════════════
+    // THÈME 3 : PRÉSENT SIMPLE – FORME INTERROGATIVE
+    // Lexique : Les conditions de travail
+    // ════════════════════════════════════════════════════════
+    {
+      id: "present-simple-interrogatif",
+      title: "Présent simple – Interrogative",
+      titleFull: "Présent simple – Forme interrogative",
+      lexique: "Les conditions de travail",
+      niveaux: [
+        {
+          niveau: 1, type: "qcm", label: "QCM", total: 15,
+          exercices: [
+            { id:"ps-int-1-1", phrase:"___ she work from home on Fridays?", options:["Do","Does","Is","Are"], correct:1, explication:"She = he/she/it → Does. ✅ Does she work? ❌ Do she work?" },
+            { id:"ps-int-1-2", phrase:"___ the employees get paid overtime?", options:["Does","Is","Do","Are"], correct:2, explication:"The employees = they → Do. ✅ Do the employees get?" },
+            { id:"ps-int-1-3", phrase:"___ the company offer flexible hours?", options:["Do","Are","Is","Does"], correct:3, explication:"The company = it → Does. ✅ Does the company offer?" },
+            { id:"ps-int-1-4", phrase:"___ you enjoy your working conditions?", options:["Does","Is","Do","Are"], correct:2, explication:"You → Do. ✅ Do you enjoy?" },
+            { id:"ps-int-1-5", phrase:"___ he have a permanent contract?", options:["Do","Is","Are","Does"], correct:3, explication:"He → Does. ✅ Does he have?" },
+            { id:"ps-int-1-6", phrase:"___ they get a bonus every year?", options:["Does","Is","Do","Are"], correct:2, explication:"They → Do. ✅ Do they get?" },
+            { id:"ps-int-1-7", phrase:"___ the manager allow remote work?", options:["Do","Are","Is","Does"], correct:3, explication:"The manager = he/she → Does. ✅ Does the manager allow?" },
+            { id:"ps-int-1-8", phrase:"___ I need to sign a new contract?", options:["Does","Is","Do","Are"], correct:2, explication:"I → Do. ✅ Do I need?" },
+            { id:"ps-int-1-9", phrase:"___ the HR team organise training sessions?", options:["Do","Are","Is","Does"], correct:3, explication:"The HR team = it → Does. ✅ Does the HR team organise?" },
+            { id:"ps-int-1-10", phrase:"___ we have access to the canteen?", options:["Does","Is","Do","Are"], correct:2, explication:"We → Do. ✅ Do we have?" },
+            { id:"ps-int-1-11", phrase:"___ she receive a company car?", options:["Do","Are","Is","Does"], correct:3, explication:"She → Does. ✅ Does she receive?" },
+            { id:"ps-int-1-12", phrase:"___ the night shifts pay more?", options:["Does","Do","Is","Are"], correct:0, explication:"The night shifts = it → Does. ✅ Does the night shift pay?" },
+            { id:"ps-int-1-13", phrase:"___ your colleagues take long breaks?", options:["Does","Is","Do","Are"], correct:2, explication:"Your colleagues = they → Do. ✅ Do your colleagues take?" },
+            { id:"ps-int-1-14", phrase:"___ he travel for work regularly?", options:["Do","Are","Is","Does"], correct:3, explication:"He → Does. ✅ Does he travel?" },
+            { id:"ps-int-1-15", phrase:"___ the contract include health insurance?", options:["Do","Are","Is","Does"], correct:3, explication:"The contract = it → Does. ✅ Does the contract include?" }
+          ]
+        },
+        {
+          niveau: 2, type: "trous", label: "Phrases à trous", total: 15,
+          exercices: [
+            { id:"ps-int-2-1", phrase:"___ ___ (do/she) get paid maternity leave?", correct:"Does she", explication:"She → Does she + verbe BASE. ✅ Does she get?" },
+            { id:"ps-int-2-2", phrase:"___ ___ (do/they) work on weekends?", correct:"Do they", explication:"They → Do they + base. ✅ Do they work?" },
+            { id:"ps-int-2-3", phrase:"___ ___ (do/the company) provide uniforms?", correct:"Does the company", explication:"The company = it → Does the company + base. ✅" },
+            { id:"ps-int-2-4", phrase:"___ ___ (do/he) commute to work by train?", correct:"Does he", explication:"He → Does he + base. ✅ Does he commute?" },
+            { id:"ps-int-2-5", phrase:"___ ___ (do/you) enjoy your working hours?", correct:"Do you", explication:"You → Do you + base. ✅ Do you enjoy?" },
+            { id:"ps-int-2-6", phrase:"___ ___ (do/the manager) allow flexible start times?", correct:"Does the manager", explication:"The manager = he/she → Does the manager + base. ✅" },
+            { id:"ps-int-2-7", phrase:"___ ___ (do/we) have a right to a lunch break?", correct:"Do we", explication:"We → Do we + base. ✅ Do we have?" },
+            { id:"ps-int-2-8", phrase:"___ ___ (do/she) supervise the new employees?", correct:"Does she", explication:"She → Does she + base. ✅ Does she supervise?" },
+            { id:"ps-int-2-9", phrase:"___ ___ (do/the union) negotiate working conditions?", correct:"Does the union", explication:"The union = it → Does the union + base. ✅" },
+            { id:"ps-int-2-10", phrase:"___ ___ (do/I) qualify for a pay rise?", correct:"Do I", explication:"I → Do I + base. ✅ Do I qualify?" },
+            { id:"ps-int-2-11", phrase:"___ ___ (do/the employees) have access to training?", correct:"Do the employees", explication:"The employees = they → Do the employees + base. ✅" },
+            { id:"ps-int-2-12", phrase:"___ ___ (do/he) work night shifts?", correct:"Does he", explication:"He → Does he + base. ✅ Does he work?" },
+            { id:"ps-int-2-13", phrase:"___ ___ (do/the contract) include pension contributions?", correct:"Does the contract", explication:"The contract = it → Does the contract + base. ✅" },
+            { id:"ps-int-2-14", phrase:"___ ___ (do/your team) meet performance targets?", correct:"Does your team", explication:"Your team = it → Does your team + base. ✅" },
+            { id:"ps-int-2-15", phrase:"___ ___ (do/they) benefit from remote work policies?", correct:"Do they", explication:"They → Do they + base. ✅" }
+          ]
+        },
+        {
+          niveau: 3, type: "ordre", label: "Remettre dans l'ordre", total: 10,
+          exercices: [
+            { id:"ps-int-3-1", mots:["she","from","Does","home","work"], correct:"Does she work from home?", explication:"Structure interrogative : Does + she + base + complément + ?" },
+            { id:"ps-int-3-2", mots:["the","get","employees","Do","overtime"], correct:"Do the employees get overtime?", explication:"Do + they (employees) + base + COD + ?" },
+            { id:"ps-int-3-3", mots:["he","a","Does","contract","have","permanent"], correct:"Does he have a permanent contract?", explication:"Does + he + base + déterminant + adjectif + COD + ?" },
+            { id:"ps-int-3-4", mots:["the","provide","company","Does","training"], correct:"Does the company provide training?", explication:"Does + the company + base + COD + ?" },
+            { id:"ps-int-3-5", mots:["take","breaks","Do","long","they"], correct:"Do they take long breaks?", explication:"Do + they + base + adjectif + COD + ?" },
+            { id:"ps-int-3-6", mots:["allow","manager","Does","the","work","remote"], correct:"Does the manager allow remote work?", explication:"Does + the manager + base + adjectif + COD + ?" },
+            { id:"ps-int-3-7", mots:["insurance","include","the","Does","health","contract"], correct:"Does the contract include health insurance?", explication:"Does + the contract + base + adjectif + COD + ?" },
+            { id:"ps-int-3-8", mots:["regularly","he","Does","travel","work","for"], correct:"Does he travel for work regularly?", explication:"Does + he + base + for + COD + adverbe + ?" },
+            { id:"ps-int-3-9", mots:["rise","qualify","I","pay","Do","for","a"], correct:"Do I qualify for a pay rise?", explication:"Do + I + base + for + déterminant + COD + ?" },
+            { id:"ps-int-3-10", mots:["conditions","working","the","Does","negotiate","union"], correct:"Does the union negotiate working conditions?", explication:"Does + the union + base + adjectif + COD + ?" }
+          ]
+        },
+        {
+          niveau: 4, type: "erreur", label: "Trouver l'erreur", total: 15,
+          exercices: [
+            { id:"ps-int-4-1", phrase:"Do she work flexible hours?", estCorrecte:false, correction:"Does she work flexible hours?", explication:"She → Does (pas Do). ✅ Does she work?" },
+            { id:"ps-int-4-2", phrase:"Do the employees get paid overtime?", estCorrecte:true, correction:null, explication:"The employees = they → Do. ✅ Phrase correcte." },
+            { id:"ps-int-4-3", phrase:"Does he travels for work?", estCorrecte:false, correction:"Does he travel for work?", explication:"Après Does, verbe à la BASE sans -s. ✅ Does he travel?" },
+            { id:"ps-int-4-4", phrase:"Does the company provide health insurance?", estCorrecte:true, correction:null, explication:"The company = it → Does + provide (base). ✅ Phrase correcte." },
+            { id:"ps-int-4-5", phrase:"Does they work on weekends?", estCorrecte:false, correction:"Do they work on weekends?", explication:"They → Do (pas Does). ✅ Do they work?" },
+            { id:"ps-int-4-6", phrase:"Do I need to sign a new contract?", estCorrecte:true, correction:null, explication:"I → Do. ✅ Phrase correcte." },
+            { id:"ps-int-4-7", phrase:"Does the manager allows overtime?", estCorrecte:false, correction:"Does the manager allow overtime?", explication:"Après Does, base verbale sans -s. ✅ Does the manager allow?" },
+            { id:"ps-int-4-8", phrase:"Do we have access to training?", estCorrecte:true, correction:null, explication:"We → Do + have (base). ✅ Phrase correcte." },
+            { id:"ps-int-4-9", phrase:"Do she receive a company car?", estCorrecte:false, correction:"Does she receive a company car?", explication:"She → Does. ✅ Does she receive?" },
+            { id:"ps-int-4-10", phrase:"Does the contract include pension contributions?", estCorrecte:true, correction:null, explication:"The contract = it → Does + include. ✅ Phrase correcte." },
+            { id:"ps-int-4-11", phrase:"Does your colleagues take long breaks?", estCorrecte:false, correction:"Do your colleagues take long breaks?", explication:"Your colleagues = they → Do. ✅ Do your colleagues take?" },
+            { id:"ps-int-4-12", phrase:"Do we benefit from remote work?", estCorrecte:true, correction:null, explication:"We → Do + benefit. ✅ Phrase correcte." },
+            { id:"ps-int-4-13", phrase:"Does the union negotiates working conditions?", estCorrecte:false, correction:"Does the union negotiate working conditions?", explication:"Après Does, base sans -s. ✅ Does the union negotiate?" },
+            { id:"ps-int-4-14", phrase:"Do they have a right to a lunch break?", estCorrecte:true, correction:null, explication:"They → Do + have. ✅ Phrase correcte." },
+            { id:"ps-int-4-15", phrase:"Does he commute by train?", estCorrecte:true, correction:null, explication:"He → Does + commute (base). ✅ Phrase correcte." }
+          ]
+        }
+      ]
+    },
+
+    // ════════════════════════════════════════════════════════
+    // THÈME 4 : PRÉTÉRIT – FORME AFFIRMATIVE
+    // Lexique : Les entreprises
+    // ════════════════════════════════════════════════════════
+    {
+      id: "preterit-affirmatif",
+      title: "Prétérit – Affirmative",
+      titleFull: "Prétérit – Forme affirmative",
+      lexique: "Les entreprises",
+      niveaux: [
+        {
+          niveau: 1, type: "qcm", label: "QCM", total: 15,
+          exercices: [
+            { id:"pr-af-1-1", phrase:"The company ___ a new factory last year.", options:["open","opens","opened","opening"], correct:2, explication:"Prétérit régulier : open + ed. ✅ opened. Pas de -s au prétérit." },
+            { id:"pr-af-1-2", phrase:"She ___ the annual report yesterday.", options:["present","presents","presenting","presented"], correct:3, explication:"Prétérit régulier : present + ed. ✅ presented." },
+            { id:"pr-af-1-3", phrase:"The CEO ___ a major deal with a foreign investor.", options:["sign","signs","signing","signed"], correct:3, explication:"Prétérit régulier : sign + ed. ✅ signed." },
+            { id:"pr-af-1-4", phrase:"They ___ their sales target last quarter.", options:["reach","reaches","reaching","reached"], correct:3, explication:"Prétérit régulier : reach + ed. ✅ reached." },
+            { id:"pr-af-1-5", phrase:"The firm ___ twenty new employees in 2022.", options:["hire","hires","hiring","hired"], correct:3, explication:"Prétérit régulier : hire + d (e final). ✅ hired." },
+            { id:"pr-af-1-6", phrase:"We ___ our main competitor last month.", options:["acquire","acquires","acquiring","acquired"], correct:3, explication:"Prétérit régulier : acquire + d. ✅ acquired." },
+            { id:"pr-af-1-7", phrase:"He ___ the company's profits by 20%.", options:["increase","increases","increasing","increased"], correct:3, explication:"Prétérit régulier : increase + d. ✅ increased." },
+            { id:"pr-af-1-8", phrase:"The board ___ a new strategy in January.", options:["approve","approves","approving","approved"], correct:3, explication:"Prétérit régulier : approve + d. ✅ approved." },
+            { id:"pr-af-1-9", phrase:"Our partners ___ the agreement last week.", options:["sign","signs","signed","signing"], correct:2, explication:"Prétérit régulier : sign + ed. ✅ signed. Même forme pour tous les sujets." },
+            { id:"pr-af-1-10", phrase:"The manager ___ a team of specialists.", options:["create","creates","creating","created"], correct:3, explication:"Prétérit régulier : create + d. ✅ created." },
+            { id:"pr-af-1-11", phrase:"The company ___ its headquarters to London.", options:["move","moves","moving","moved"], correct:3, explication:"Prétérit régulier : move + d. ✅ moved." },
+            { id:"pr-af-1-12", phrase:"She ___ a presentation to the shareholders.", options:["deliver","delivers","delivered","delivering"], correct:2, explication:"Prétérit régulier : deliver + ed. ✅ delivered." },
+            { id:"pr-af-1-13", phrase:"They ___ a new product range last spring.", options:["launch","launches","launched","launching"], correct:2, explication:"Prétérit régulier : launch + ed. ✅ launched." },
+            { id:"pr-af-1-14", phrase:"He ___ the financial results to the press.", options:["announce","announces","announcing","announced"], correct:3, explication:"Prétérit régulier : announce + d. ✅ announced." },
+            { id:"pr-af-1-15", phrase:"The firm ___ its turnover by 30% last year.", options:["boost","boosts","boosted","boosting"], correct:2, explication:"Prétérit régulier : boost + ed. ✅ boosted." }
+          ]
+        },
+        {
+          niveau: 2, type: "trous", label: "Phrases à trous", total: 15,
+          exercices: [
+            { id:"pr-af-2-1", phrase:"The company ___ (invest) heavily in new technology.", correct:"invested", explication:"Prétérit régulier : invest + ed. ✅ invested." },
+            { id:"pr-af-2-2", phrase:"She ___ (manage) the whole merger process.", correct:"managed", explication:"Prétérit régulier : manage + d. ✅ managed." },
+            { id:"pr-af-2-3", phrase:"They ___ (expand) into the Asian market.", correct:"expanded", explication:"Prétérit régulier : expand + ed. ✅ expanded." },
+            { id:"pr-af-2-4", phrase:"He ___ (negotiate) better terms with suppliers.", correct:"negotiated", explication:"Prétérit régulier : negotiate + d. ✅ negotiated." },
+            { id:"pr-af-2-5", phrase:"The board ___ (decide) to cut costs.", correct:"decided", explication:"Prétérit régulier : decide + d. ✅ decided." },
+            { id:"pr-af-2-6", phrase:"Our firm ___ (partner) with a French company.", correct:"partnered", explication:"Prétérit régulier : partner + ed. ✅ partnered." },
+            { id:"pr-af-2-7", phrase:"The director ___ (present) the annual results.", correct:"presented", explication:"Prétérit régulier : present + ed. ✅ presented." },
+            { id:"pr-af-2-8", phrase:"We ___ (close) three branches last year.", correct:"closed", explication:"Prétérit régulier : close + d. ✅ closed." },
+            { id:"pr-af-2-9", phrase:"The company ___ (reduce) its workforce.", correct:"reduced", explication:"Prétérit régulier : reduce + d. ✅ reduced." },
+            { id:"pr-af-2-10", phrase:"She ___ (organise) the trade fair last June.", correct:"organised", explication:"Prétérit régulier : organise + d. ✅ organised." },
+            { id:"pr-af-2-11", phrase:"They ___ (achieve) record sales in 2023.", correct:"achieved", explication:"Prétérit régulier : achieve + d. ✅ achieved." },
+            { id:"pr-af-2-12", phrase:"He ___ (report) the figures to the CEO.", correct:"reported", explication:"Prétérit régulier : report + ed. ✅ reported." },
+            { id:"pr-af-2-13", phrase:"The marketing team ___ (launch) a new campaign.", correct:"launched", explication:"Prétérit régulier : launch + ed. ✅ launched." },
+            { id:"pr-af-2-14", phrase:"Our company ___ (celebrate) its 50th anniversary.", correct:"celebrated", explication:"Prétérit régulier : celebrate + d. ✅ celebrated." },
+            { id:"pr-af-2-15", phrase:"The shareholders ___ (approve) the new strategy.", correct:"approved", explication:"Prétérit régulier : approve + d. ✅ approved." }
+          ]
+        },
+        {
+          niveau: 3, type: "ordre", label: "Remettre dans l'ordre", total: 10,
+          exercices: [
+            { id:"pr-af-3-1", mots:["opened","year","The","factory","company","a","new","last"], correct:"The company opened a new factory last year.", explication:"Prétérit : Sujet + verbe-ed + COD + complément de temps." },
+            { id:"pr-af-3-2", mots:["the","She","annual","presented","shareholders","to","results"], correct:"She presented the annual results to the shareholders.", explication:"Sujet + verbe-ed + COD + to + complément." },
+            { id:"pr-af-3-3", mots:["deal","signed","major","a","They","2022","in"], correct:"They signed a major deal in 2022.", explication:"Sujet + verbe-ed + déterminant + adjectif + COD + complément de temps." },
+            { id:"pr-af-3-4", mots:["into","expanded","market","the","Our","Asian","company"], correct:"Our company expanded into the Asian market.", explication:"Sujet + verbe-ed + into + déterminant + adjectif + COD." },
+            { id:"pr-af-3-5", mots:["profits","He","by","increased","20%","the","company's"], correct:"He increased the company's profits by 20%.", explication:"Sujet + verbe-ed + COD + by + pourcentage." },
+            { id:"pr-af-3-6", mots:["costs","board","decided","cut","The","to"], correct:"The board decided to cut costs.", explication:"Sujet + verbe-ed + to + infinitif + COD." },
+            { id:"pr-af-3-7", mots:["new","The","launched","a","team","marketing","campaign"], correct:"The marketing team launched a new campaign.", explication:"Sujet + verbe-ed + déterminant + adjectif + COD." },
+            { id:"pr-af-3-8", mots:["workforce","reduced","company","its","The","significantly"], correct:"The company reduced its workforce significantly.", explication:"Sujet + verbe-ed + COD + adverbe." },
+            { id:"pr-af-3-9", mots:["headquarters","London","The","moved","its","firm","to"], correct:"The firm moved its headquarters to London.", explication:"Sujet + verbe-ed + COD + to + lieu." },
+            { id:"pr-af-3-10", mots:["record","achieved","sales","in","2023","They"], correct:"They achieved record sales in 2023.", explication:"Sujet + verbe-ed + adjectif + COD + complément de temps." }
+          ]
+        },
+        {
+          niveau: 4, type: "erreur", label: "Trouver l'erreur", total: 15,
+          exercices: [
+            { id:"pr-af-4-1", phrase:"The company opens a new branch last year.", estCorrecte:false, correction:"The company opened a new branch last year.", explication:"'last year' indique le passé → prétérit. ✅ opened." },
+            { id:"pr-af-4-2", phrase:"She presented the annual report yesterday.", estCorrecte:true, correction:null, explication:"present + ed = presented. ✅ Phrase correcte." },
+            { id:"pr-af-4-3", phrase:"They singed the contract in January.", estCorrecte:false, correction:"They signed the contract in January.", explication:"Prétérit de sign = signed (pas singed). ✅ signed." },
+            { id:"pr-af-4-4", phrase:"He increased the firm's profits last quarter.", estCorrecte:true, correction:null, explication:"increase + d = increased. ✅ Phrase correcte." },
+            { id:"pr-af-4-5", phrase:"The board approveed the new budget.", estCorrecte:false, correction:"The board approved the new budget.", explication:"approve + d = approved (pas approveed). ✅ approved." },
+            { id:"pr-af-4-6", phrase:"We closed three branches in 2022.", estCorrecte:true, correction:null, explication:"close + d = closed. ✅ Phrase correcte." },
+            { id:"pr-af-4-7", phrase:"She managed the merger process successfully.", estCorrecte:true, correction:null, explication:"manage + d = managed. ✅ Phrase correcte." },
+            { id:"pr-af-4-8", phrase:"The company investted in new technology.", estCorrecte:false, correction:"The company invested in new technology.", explication:"invest + ed = invested (pas investted). ✅ invested." },
+            { id:"pr-af-4-9", phrase:"They expanded into the Asian market last year.", estCorrecte:true, correction:null, explication:"expand + ed = expanded. ✅ Phrase correcte." },
+            { id:"pr-af-4-10", phrase:"He negociated better terms with suppliers.", estCorrecte:false, correction:"He negotiated better terms with suppliers.", explication:"Faute d'orthographe : negotiated (pas negociated). ✅ negotiated." },
+            { id:"pr-af-4-11", phrase:"The marketing team launched a new campaign.", estCorrecte:true, correction:null, explication:"launch + ed = launched. ✅ Phrase correcte." },
+            { id:"pr-af-4-12", phrase:"Our company celebrate its 50th anniversary last year.", estCorrecte:false, correction:"Our company celebrated its 50th anniversary last year.", explication:"Passé → prétérit. celebrate + d = celebrated. ✅ celebrated." },
+            { id:"pr-af-4-13", phrase:"The shareholders approved the new strategy.", estCorrecte:true, correction:null, explication:"approve + d = approved. ✅ Phrase correcte." },
+            { id:"pr-af-4-14", phrase:"She organised the trade fair last June.", estCorrecte:true, correction:null, explication:"organise + d = organised. ✅ Phrase correcte." },
+            { id:"pr-af-4-15", phrase:"The firm moved it's headquarters to London.", estCorrecte:false, correction:"The firm moved its headquarters to London.", explication:"its (adjectif possessif) ≠ it's (it is). ✅ its headquarters." }
+          ]
+        }
+      ]
+    },
+
+    // ════════════════════════════════════════════════════════
+    // THÈME 5 : PRÉTÉRIT – FORME NÉGATIVE
+    // Lexique : Le cinéma
+    // ════════════════════════════════════════════════════════
+    {
+      id: "preterit-negatif",
+      title: "Prétérit – Négative",
+      titleFull: "Prétérit – Forme négative",
+      lexique: "Le cinéma",
+      niveaux: [
+        {
+          niveau: 1, type: "qcm", label: "QCM", total: 15,
+          exercices: [
+            { id:"pr-ng-1-1", phrase:"The film ___ win the award.", options:["don't","doesn't","didn't","not"], correct:2, explication:"Prétérit négatif : didn't + base pour TOUS les sujets. ✅ didn't win." },
+            { id:"pr-ng-1-2", phrase:"She ___ enjoy the documentary.", options:["don't","didn't","doesn't","not"], correct:1, explication:"Prétérit négatif : didn't + base. ✅ didn't enjoy." },
+            { id:"pr-ng-1-3", phrase:"They ___ watch the premiere.", options:["doesn't","don't","not","didn't"], correct:3, explication:"Prétérit négatif : didn't (même forme pour they). ✅ didn't watch." },
+            { id:"pr-ng-1-4", phrase:"He ___ like the director's new style.", options:["didn't","don't","doesn't","not"], correct:0, explication:"Prétérit négatif : didn't + base. ✅ didn't like." },
+            { id:"pr-ng-1-5", phrase:"The actor ___ receive the Oscar.", options:["don't","doesn't","not","didn't"], correct:3, explication:"Prétérit négatif : didn't, même pour he/she/it. ✅ didn't receive." },
+            { id:"pr-ng-1-6", phrase:"I ___ understand the plot.", options:["didn't","don't","doesn't","not did"], correct:0, explication:"Prétérit négatif : didn't + base. ✅ didn't understand." },
+            { id:"pr-ng-1-7", phrase:"The sequel ___ attract many viewers.", options:["don't","doesn't","didn't","not"], correct:2, explication:"didn't, quelle que soit la personne. ✅ didn't attract." },
+            { id:"pr-ng-1-8", phrase:"We ___ buy tickets in advance.", options:["doesn't","didn't","don't","not"], correct:1, explication:"Prétérit négatif : didn't. ✅ didn't buy." },
+            { id:"pr-ng-1-9", phrase:"She ___ recognise the famous actor.", options:["didn't","don't","doesn't","not"], correct:0, explication:"didn't + base (recognise sans -d). ✅ didn't recognise." },
+            { id:"pr-ng-1-10", phrase:"The studio ___ release the film on time.", options:["don't","doesn't","didn't","not"], correct:2, explication:"Prétérit négatif : didn't + base. ✅ didn't release." },
+            { id:"pr-ng-1-11", phrase:"They ___ agree with the critics.", options:["didn't","doesn't","don't","not"], correct:0, explication:"didn't + base. ✅ didn't agree." },
+            { id:"pr-ng-1-12", phrase:"He ___ appear in the final scene.", options:["don't","doesn't","not","didn't"], correct:3, explication:"Prétérit négatif : didn't. ✅ didn't appear." },
+            { id:"pr-ng-1-13", phrase:"The cinema ___ screen the original version.", options:["didn't","don't","doesn't","not"], correct:0, explication:"didn't + base. ✅ didn't screen." },
+            { id:"pr-ng-1-14", phrase:"I ___ finish the popcorn during the film.", options:["don't","doesn't","didn't","not"], correct:2, explication:"Prétérit négatif : didn't. ✅ didn't finish." },
+            { id:"pr-ng-1-15", phrase:"The director ___ reveal the ending.", options:["don't","doesn't","didn't","not did"], correct:2, explication:"didn't + base. ✅ didn't reveal." }
+          ]
+        },
+        {
+          niveau: 2, type: "trous", label: "Phrases à trous", total: 15,
+          exercices: [
+            { id:"pr-ng-2-1", phrase:"The film ___ ___ (not/win) the Palme d'Or.", correct:"didn't win", explication:"Prétérit négatif : didn't + base. ✅ didn't win." },
+            { id:"pr-ng-2-2", phrase:"She ___ ___ (not/enjoy) the horror film.", correct:"didn't enjoy", explication:"didn't + enjoy (base). ✅ didn't enjoy." },
+            { id:"pr-ng-2-3", phrase:"They ___ ___ (not/buy) tickets in advance.", correct:"didn't buy", explication:"didn't + buy (base). ✅ didn't buy." },
+            { id:"pr-ng-2-4", phrase:"He ___ ___ (not/understand) the plot.", correct:"didn't understand", explication:"didn't + understand (base). ✅ didn't understand." },
+            { id:"pr-ng-2-5", phrase:"The studio ___ ___ (not/release) the film on time.", correct:"didn't release", explication:"didn't + release (base). ✅ didn't release." },
+            { id:"pr-ng-2-6", phrase:"I ___ ___ (not/recognise) the actor.", correct:"didn't recognise", explication:"didn't + recognise (base). ✅ didn't recognise." },
+            { id:"pr-ng-2-7", phrase:"The director ___ ___ (not/reveal) the ending.", correct:"didn't reveal", explication:"didn't + reveal (base). ✅ didn't reveal." },
+            { id:"pr-ng-2-8", phrase:"We ___ ___ (not/stay) until the end.", correct:"didn't stay", explication:"didn't + stay (base). ✅ didn't stay." },
+            { id:"pr-ng-2-9", phrase:"The actress ___ ___ (not/attend) the ceremony.", correct:"didn't attend", explication:"didn't + attend (base). ✅ didn't attend." },
+            { id:"pr-ng-2-10", phrase:"The audience ___ ___ (not/appreciate) the sequel.", correct:"didn't appreciate", explication:"didn't + appreciate (base). ✅ didn't appreciate." },
+            { id:"pr-ng-2-11", phrase:"She ___ ___ (not/agree) with the critics.", correct:"didn't agree", explication:"didn't + agree (base). ✅ didn't agree." },
+            { id:"pr-ng-2-12", phrase:"The cinema ___ ___ (not/screen) the subtitled version.", correct:"didn't screen", explication:"didn't + screen (base). ✅ didn't screen." },
+            { id:"pr-ng-2-13", phrase:"He ___ ___ (not/appear) in the final scene.", correct:"didn't appear", explication:"didn't + appear (base). ✅ didn't appear." },
+            { id:"pr-ng-2-14", phrase:"They ___ ___ (not/watch) the documentary.", correct:"didn't watch", explication:"didn't + watch (base). ✅ didn't watch." },
+            { id:"pr-ng-2-15", phrase:"The sequel ___ ___ (not/attract) many viewers.", correct:"didn't attract", explication:"didn't + attract (base). ✅ didn't attract." }
+          ]
+        },
+        {
+          niveau: 3, type: "ordre", label: "Remettre dans l'ordre", total: 10,
+          exercices: [
+            { id:"pr-ng-3-1", mots:["the","didn't","The","win","film","award"], correct:"The film didn't win the award.", explication:"Prétérit négatif : Sujet + didn't + base + COD." },
+            { id:"pr-ng-3-2", mots:["the","She","enjoy","didn't","documentary"], correct:"She didn't enjoy the documentary.", explication:"Sujet + didn't + base + COD." },
+            { id:"pr-ng-3-3", mots:["advance","didn't","in","buy","They","tickets"], correct:"They didn't buy tickets in advance.", explication:"Sujet + didn't + base + COD + complément." },
+            { id:"pr-ng-3-4", mots:["plot","the","He","understand","didn't"], correct:"He didn't understand the plot.", explication:"Sujet + didn't + base + COD." },
+            { id:"pr-ng-3-5", mots:["The","on","release","didn't","film","time","studio","the"], correct:"The studio didn't release the film on time.", explication:"Sujet + didn't + base + COD + complément." },
+            { id:"pr-ng-3-6", mots:["critics","with","didn't","the","agree","I"], correct:"I didn't agree with the critics.", explication:"Sujet + didn't + base + with + COD." },
+            { id:"pr-ng-3-7", mots:["the","didn't","The","screen","cinema","version","subtitled"], correct:"The cinema didn't screen the subtitled version.", explication:"Sujet + didn't + base + COD composé." },
+            { id:"pr-ng-3-8", mots:["ending","The","reveal","didn't","the","director"], correct:"The director didn't reveal the ending.", explication:"Sujet + didn't + base + COD." },
+            { id:"pr-ng-3-9", mots:["ceremony","attend","The","didn't","actress","the"], correct:"The actress didn't attend the ceremony.", explication:"Sujet + didn't + base + COD." },
+            { id:"pr-ng-3-10", mots:["viewers","The","attract","many","sequel","didn't"], correct:"The sequel didn't attract many viewers.", explication:"Sujet + didn't + base + adjectif + COD." }
+          ]
+        },
+        {
+          niveau: 4, type: "erreur", label: "Trouver l'erreur", total: 15,
+          exercices: [
+            { id:"pr-ng-4-1", phrase:"She didn't enjoyed the film.", estCorrecte:false, correction:"She didn't enjoy the film.", explication:"Après didn't, verbe à la BASE sans -ed. ✅ didn't enjoy." },
+            { id:"pr-ng-4-2", phrase:"The studio didn't release the film on time.", estCorrecte:true, correction:null, explication:"didn't + release (base). ✅ Phrase correcte." },
+            { id:"pr-ng-4-3", phrase:"He doesn't watch the premiere last night.", estCorrecte:false, correction:"He didn't watch the premiere last night.", explication:"'last night' = passé → prétérit. ✅ didn't watch." },
+            { id:"pr-ng-4-4", phrase:"They didn't agree with the critics.", estCorrecte:true, correction:null, explication:"didn't + agree (base). ✅ Phrase correcte." },
+            { id:"pr-ng-4-5", phrase:"The actor didn't received the Oscar.", estCorrecte:false, correction:"The actor didn't receive the Oscar.", explication:"Après didn't, base verbale sans -ed. ✅ didn't receive." },
+            { id:"pr-ng-4-6", phrase:"I didn't understand the plot.", estCorrecte:true, correction:null, explication:"didn't + understand (base). ✅ Phrase correcte." },
+            { id:"pr-ng-4-7", phrase:"The cinema not screen the subtitled version.", estCorrecte:false, correction:"The cinema didn't screen the subtitled version.", explication:"Prétérit négatif = didn't + base, pas 'not' seul. ✅ didn't screen." },
+            { id:"pr-ng-4-8", phrase:"She didn't recognise the famous actor.", estCorrecte:true, correction:null, explication:"didn't + recognise (base). ✅ Phrase correcte." },
+            { id:"pr-ng-4-9", phrase:"We didn't stayed until the end.", estCorrecte:false, correction:"We didn't stay until the end.", explication:"Après didn't, base sans -ed. ✅ didn't stay." },
+            { id:"pr-ng-4-10", phrase:"The director didn't reveal the ending.", estCorrecte:true, correction:null, explication:"didn't + reveal (base). ✅ Phrase correcte." },
+            { id:"pr-ng-4-11", phrase:"The audience didn't appreciated the sequel.", estCorrecte:false, correction:"The audience didn't appreciate the sequel.", explication:"Après didn't, base sans -ed. ✅ didn't appreciate." },
+            { id:"pr-ng-4-12", phrase:"He didn't appear in the final scene.", estCorrecte:true, correction:null, explication:"didn't + appear (base). ✅ Phrase correcte." },
+            { id:"pr-ng-4-13", phrase:"They didn't watch the documentary.", estCorrecte:true, correction:null, explication:"didn't + watch (base). ✅ Phrase correcte." },
+            { id:"pr-ng-4-14", phrase:"She didn't went to the premiere.", estCorrecte:false, correction:"She didn't go to the premiere.", explication:"Après didn't, BASE verbale (go, pas went). ✅ didn't go." },
+            { id:"pr-ng-4-15", phrase:"The sequel didn't attract many viewers.", estCorrecte:true, correction:null, explication:"didn't + attract (base). ✅ Phrase correcte." }
+          ]
+        }
+      ]
+    },
+
+    // ════════════════════════════════════════════════════════
+    // THÈME 6 : PRÉTÉRIT – FORME INTERROGATIVE
+    // Lexique : Les stages
+    // ════════════════════════════════════════════════════════
+    {
+      id: "preterit-interrogatif",
+      title: "Prétérit – Interrogative",
+      titleFull: "Prétérit – Forme interrogative",
+      lexique: "Les stages",
+      niveaux: [
+        {
+          niveau: 1, type: "qcm", label: "QCM", total: 15,
+          exercices: [
+            { id:"pr-int-1-1", phrase:"___ she enjoy her work placement?", options:["Do","Does","Did","Was"], correct:2, explication:"Prétérit interrogatif : Did + base pour TOUS les sujets. ✅ Did she enjoy?" },
+            { id:"pr-int-1-2", phrase:"___ they visit the production site?", options:["Does","Did","Do","Were"], correct:1, explication:"Prétérit interrogatif : Did + base. ✅ Did they visit?" },
+            { id:"pr-int-1-3", phrase:"___ he meet his supervisor on the first day?", options:["Do","Does","Was","Did"], correct:3, explication:"Prétérit interrogatif : Did + base. ✅ Did he meet?" },
+            { id:"pr-int-1-4", phrase:"___ the intern complete all the tasks?", options:["Does","Do","Did","Was"], correct:2, explication:"Did, même pour he/she/it. ✅ Did the intern complete?" },
+            { id:"pr-int-1-5", phrase:"___ you learn new skills during the placement?", options:["Did","Do","Does","Were"], correct:0, explication:"Prétérit interrogatif : Did + base. ✅ Did you learn?" },
+            { id:"pr-int-1-6", phrase:"___ the company offer a paid internship?", options:["Do","Does","Was","Did"], correct:3, explication:"Did, quelle que soit la personne. ✅ Did the company offer?" },
+            { id:"pr-int-1-7", phrase:"___ she work with the sales team?", options:["Does","Do","Did","Were"], correct:2, explication:"Did + base. ✅ Did she work?" },
+            { id:"pr-int-1-8", phrase:"___ they provide accommodation for interns?", options:["Does","Did","Do","Was"], correct:1, explication:"Prétérit interrogatif : Did. ✅ Did they provide?" },
+            { id:"pr-int-1-9", phrase:"___ he write a report at the end of the placement?", options:["Do","Does","Did","Was"], correct:2, explication:"Did + base. ✅ Did he write?" },
+            { id:"pr-int-1-10", phrase:"___ the manager give her feedback?", options:["Did","Do","Does","Were"], correct:0, explication:"Prétérit interrogatif : Did. ✅ Did the manager give?" },
+            { id:"pr-int-1-11", phrase:"___ you attend any training sessions?", options:["Does","Do","Was","Did"], correct:3, explication:"Did + base. ✅ Did you attend?" },
+            { id:"pr-int-1-12", phrase:"___ the intern adapt quickly to the team?", options:["Do","Does","Did","Was"], correct:2, explication:"Did + base. ✅ Did the intern adapt?" },
+            { id:"pr-int-1-13", phrase:"___ she present her work at the end?", options:["Did","Do","Does","Were"], correct:0, explication:"Prétérit interrogatif : Did. ✅ Did she present?" },
+            { id:"pr-int-1-14", phrase:"___ they evaluate her performance?", options:["Does","Do","Was","Did"], correct:3, explication:"Did + base. ✅ Did they evaluate?" },
+            { id:"pr-int-1-15", phrase:"___ he enjoy working abroad?", options:["Do","Does","Did","Were"], correct:2, explication:"Did + base. ✅ Did he enjoy?" }
+          ]
+        },
+        {
+          niveau: 2, type: "trous", label: "Phrases à trous", total: 15,
+          exercices: [
+            { id:"pr-int-2-1", phrase:"___ ___ (did/she) enjoy her work placement?", correct:"Did she", explication:"Prétérit interrogatif : Did + sujet + base. ✅ Did she enjoy?" },
+            { id:"pr-int-2-2", phrase:"___ ___ (did/they) visit the head office?", correct:"Did they", explication:"Did + they + base. ✅ Did they visit?" },
+            { id:"pr-int-2-3", phrase:"___ ___ (did/he) meet his mentor on day one?", correct:"Did he", explication:"Did + he + base. ✅ Did he meet?" },
+            { id:"pr-int-2-4", phrase:"___ ___ (did/the company) provide training?", correct:"Did the company", explication:"Did + the company + base. ✅ Did the company provide?" },
+            { id:"pr-int-2-5", phrase:"___ ___ (did/you) learn any new skills?", correct:"Did you", explication:"Did + you + base. ✅ Did you learn?" },
+            { id:"pr-int-2-6", phrase:"___ ___ (did/she) work with the marketing team?", correct:"Did she", explication:"Did + she + base. ✅ Did she work?" },
+            { id:"pr-int-2-7", phrase:"___ ___ (did/the intern) complete the report?", correct:"Did the intern", explication:"Did + the intern + base. ✅ Did the intern complete?" },
+            { id:"pr-int-2-8", phrase:"___ ___ (did/they) offer a contract afterwards?", correct:"Did they", explication:"Did + they + base. ✅ Did they offer?" },
+            { id:"pr-int-2-9", phrase:"___ ___ (did/he) attend the team meetings?", correct:"Did he", explication:"Did + he + base. ✅ Did he attend?" },
+            { id:"pr-int-2-10", phrase:"___ ___ (did/the manager) give feedback regularly?", correct:"Did the manager", explication:"Did + the manager + base. ✅ Did the manager give?" },
+            { id:"pr-int-2-11", phrase:"___ ___ (did/you) enjoy working abroad?", correct:"Did you", explication:"Did + you + base. ✅ Did you enjoy?" },
+            { id:"pr-int-2-12", phrase:"___ ___ (did/she) present her work at the end?", correct:"Did she", explication:"Did + she + base. ✅ Did she present?" },
+            { id:"pr-int-2-13", phrase:"___ ___ (did/they) evaluate her performance?", correct:"Did they", explication:"Did + they + base. ✅ Did they evaluate?" },
+            { id:"pr-int-2-14", phrase:"___ ___ (did/he) adapt quickly to the team?", correct:"Did he", explication:"Did + he + base. ✅ Did he adapt?" },
+            { id:"pr-int-2-15", phrase:"___ ___ (did/the company) pay the interns?", correct:"Did the company", explication:"Did + the company + base. ✅ Did the company pay?" }
+          ]
+        },
+        {
+          niveau: 3, type: "ordre", label: "Remettre dans l'ordre", total: 10,
+          exercices: [
+            { id:"pr-int-3-1", mots:["placement?","enjoy","Did","her","she","work"], correct:"Did she enjoy her work placement?", explication:"Prétérit interrogatif : Did + sujet + base + COD + ?" },
+            { id:"pr-int-3-2", mots:["training","Did","provide","company","the","sessions?"], correct:"Did the company provide training sessions?", explication:"Did + sujet + base + COD + ?" },
+            { id:"pr-int-3-3", mots:["abroad?","enjoy","Did","working","he"], correct:"Did he enjoy working abroad?", explication:"Did + sujet + base + COD + ?" },
+            { id:"pr-int-3-4", mots:["learn","Did","skills?","you","new","any"], correct:"Did you learn any new skills?", explication:"Did + sujet + base + adjectif + COD + ?" },
+            { id:"pr-int-3-5", mots:["team?","Did","with","she","work","the","marketing"], correct:"Did she work with the marketing team?", explication:"Did + sujet + base + with + COD + ?" },
+            { id:"pr-int-3-6", mots:["manager","feedback?","the","Did","give","regular"], correct:"Did the manager give regular feedback?", explication:"Did + sujet + base + adjectif + COD + ?" },
+            { id:"pr-int-3-7", mots:["the","Did","complete","intern","report?","the"], correct:"Did the intern complete the report?", explication:"Did + sujet + base + COD + ?" },
+            { id:"pr-int-3-8", mots:["day","meet","one?","on","Did","he","supervisor","his"], correct:"Did he meet his supervisor on day one?", explication:"Did + sujet + base + COD + complément + ?" },
+            { id:"pr-int-3-9", mots:["performance?","Did","evaluate","her","they"], correct:"Did they evaluate her performance?", explication:"Did + sujet + base + COD + ?" },
+            { id:"pr-int-3-10", mots:["the","Did","offer","contract?","company","a"], correct:"Did the company offer a contract?", explication:"Did + sujet + base + déterminant + COD + ?" }
+          ]
+        },
+        {
+          niveau: 4, type: "erreur", label: "Trouver l'erreur", total: 15,
+          exercices: [
+            { id:"pr-int-4-1", phrase:"Did she enjoyed her work placement?", estCorrecte:false, correction:"Did she enjoy her work placement?", explication:"Après Did, verbe à la BASE sans -ed. ✅ Did she enjoy?" },
+            { id:"pr-int-4-2", phrase:"Did they visit the production site?", estCorrecte:true, correction:null, explication:"Did + they + visit (base). ✅ Phrase correcte." },
+            { id:"pr-int-4-3", phrase:"Does he meet his supervisor last week?", estCorrecte:false, correction:"Did he meet his supervisor last week?", explication:"'last week' = passé → Did (pas Does). ✅ Did he meet?" },
+            { id:"pr-int-4-4", phrase:"Did the company offer a paid internship?", estCorrecte:true, correction:null, explication:"Did + the company + offer (base). ✅ Phrase correcte." },
+            { id:"pr-int-4-5", phrase:"Did you learned new skills?", estCorrecte:false, correction:"Did you learn new skills?", explication:"Après Did, base verbale sans -ed. ✅ Did you learn?" },
+            { id:"pr-int-4-6", phrase:"Did she work with the sales team?", estCorrecte:true, correction:null, explication:"Did + she + work (base). ✅ Phrase correcte." },
+            { id:"pr-int-4-7", phrase:"Did they provided accommodation?", estCorrecte:false, correction:"Did they provide accommodation?", explication:"Après Did, base sans -ed. ✅ Did they provide?" },
+            { id:"pr-int-4-8", phrase:"Did the manager give her feedback?", estCorrecte:true, correction:null, explication:"Did + the manager + give (base). ✅ Phrase correcte." },
+            { id:"pr-int-4-9", phrase:"Did he wrote a report at the end?", estCorrecte:false, correction:"Did he write a report at the end?", explication:"Après Did, BASE verbale (write, pas wrote). ✅ Did he write?" },
+            { id:"pr-int-4-10", phrase:"Did you attend any training sessions?", estCorrecte:true, correction:null, explication:"Did + you + attend (base). ✅ Phrase correcte." },
+            { id:"pr-int-4-11", phrase:"Did the intern adapted quickly?", estCorrecte:false, correction:"Did the intern adapt quickly?", explication:"Après Did, base sans -ed. ✅ Did the intern adapt?" },
+            { id:"pr-int-4-12", phrase:"Did she present her work at the end?", estCorrecte:true, correction:null, explication:"Did + she + present (base). ✅ Phrase correcte." },
+            { id:"pr-int-4-13", phrase:"Did they evaluated her performance?", estCorrecte:false, correction:"Did they evaluate her performance?", explication:"Après Did, base sans -ed. ✅ Did they evaluate?" },
+            { id:"pr-int-4-14", phrase:"Did he enjoy working abroad?", estCorrecte:true, correction:null, explication:"Did + he + enjoy (base). ✅ Phrase correcte." },
+            { id:"pr-int-4-15", phrase:"Did the company payed the interns?", estCorrecte:false, correction:"Did the company pay the interns?", explication:"Après Did, base sans -ed. ✅ Did the company pay?" }
+          ]
+        }
+      ]
+    }
+
+  ] // fin themes
+}; // fin EXERCISES_DATA
+<script>
+// ============================================================
+//  GRAMY – JAVASCRIPT COMPLET
+//  Routing, Auth, Exercices, Scores, Bilan, Animations
+// ============================================================
+
+// ─── ÉTAT GLOBAL ────────────────────────────────────────────
+let currentEleve = null;       // { prenom2, nom2, classe, key }
+let currentTheme = null;       // objet thème en cours
+let currentNiveau = null;      // objet niveau en cours
+let currentExIndex = 0;        // index question courante
+let currentReponses = [];      // réponses données
+let currentScore = 0;          // score en cours
+let ordreBuilt = [];           // mots placés (type ordre)
+let ordreBank = [];            // mots restants (type ordre)
+let erreurVerdict = null;      // verdict choisi (type erreur)
+let erreurCorrInput = "";      // correction saisie (type erreur)
+let validated = false;         // question déjà validée ?
+
+// ─── ROUTING ────────────────────────────────────────────────
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const page = document.getElementById(id);
+  if (page) page.classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+// ─── FOND ÉTOILÉ ────────────────────────────────────────────
+function initStars() {
+  const bg = document.getElementById('starsBg');
+  if (!bg) return;
+  for (let i = 0; i < 80; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    s.style.cssText = `left:${Math.random()*100}%;top:${Math.random()*100}%;
+      animation-delay:${Math.random()*3}s;animation-duration:${1.5+Math.random()*2}s;
+      width:${1+Math.random()*3}px;height:${1+Math.random()*3}px;`;
+    bg.appendChild(s);
+  }
+  // nuages
+  for (let i = 0; i < 4; i++) {
+    const c = document.createElement('div');
+    c.className = 'cloud';
+    c.style.cssText = `top:${10+Math.random()*40}%;width:${120+Math.random()*100}px;
+      height:${40+Math.random()*30}px;
+      animation-duration:${30+Math.random()*30}s;
+      animation-delay:${-Math.random()*30}s;`;
+    bg.appendChild(c);
+  }
+}
+
+// ─── ANIMATIONS PIÈCES ──────────────────────────────────────
+function spawnCoins(n = 5) {
+  for (let i = 0; i < n; i++) {
+    setTimeout(() => {
+      const coin = document.createElement('div');
+      coin.className = 'coin';
+      coin.textContent = '🪙';
+      coin.style.cssText = `left:${20+Math.random()*60}%;top:${40+Math.random()*30}%;
+        animation-delay:${Math.random()*0.3}s;`;
+      document.body.appendChild(coin);
+      setTimeout(() => coin.remove(), 1800);
+    }, i * 100);
+  }
+}
+
+function spawnConfetti() {
+  const colors = ['#E52521','#049CD8','#FBD000','#43B047','#F89400'];
+  for (let i = 0; i < 30; i++) {
+    setTimeout(() => {
+      const p = document.createElement('div');
+      p.className = 'confetti-piece';
+      p.style.cssText = `left:${Math.random()*100}%;top:${Math.random()*40}%;
+        background:${colors[Math.floor(Math.random()*colors.length)]};
+        border-radius:${Math.random()>0.5?'50%':'2px'};
+        animation-delay:${Math.random()*0.5}s;
+        animation-duration:${1.5+Math.random()}s;`;
+      document.body.appendChild(p);
+      setTimeout(() => p.remove(), 2200);
+    }, i * 60);
+  }
+}
+
+// ─── AUTHENTIFICATION PROF ──────────────────────────────────
+function checkProfCode() {
+  const val = document.getElementById('prof-code-input').value.trim();
+  const err = document.getElementById('prof-code-error');
+  err.classList.remove('show');
+  if (val === '0504') {
+    loadProfDashboard();
+    showPage('page-prof');
+  } else {
+    err.classList.add('show');
+    document.getElementById('prof-code-input').value = '';
+  }
+}
+
+function loadProfDashboard() {
+  // Code élève actuel
+  const code = localStorage.getItem('gramy_code_eleve') || '';
+  const disp = document.getElementById('code-actuel-display');
+  disp.textContent = code ? `Code actuel : ${code}` : 'Aucun code défini';
+  disp.classList.add('show');
+  // Clé API
+  const key = localStorage.getItem('gramy_api_key') || '';
+  if (key) document.getElementById('api-key-input').value = key;
+  // Liste élèves
+  loadElevesList();
+  // Format JSON hint
+  document.getElementById('json-format-hint').textContent = `{
+  "id": "present-perfect-affirmatif",
+  "title": "Present Perfect – Affirmative",
+  "titleFull": "Present Perfect – Forme affirmative",
+  "lexique": "Les voyages",
+  "niveaux": [
+    {
+      "niveau": 1,
+      "type": "qcm",
+      "label": "QCM",
+      "total": 15,
+      "exercices": [
+        {
+          "id": "pp-af-1-1",
+          "phrase": "She ___ to Paris twice.",
+          "options": ["go","went","has gone","have gone"],
+          "correct": 2,
+          "explication": "She = he/she/it → has + participe passé. ✅ has gone."
+        }
+        /* ... 14 autres */
+      ]
+    }
+    /* niveaux 2, 3, 4 ... */
+  ]
+}`;
+}
+
+function switchProfTab(tabId) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.prof-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
+  event.target.classList.add('active');
+}
+
+function saveEleveCode() {
+  const val = document.getElementById('new-eleve-code').value.trim().toUpperCase();
+  const ok = document.getElementById('code-save-ok');
+  ok.classList.remove('show');
+  if (val.length < 4) { alert('Le code doit faire au moins 4 caractères.'); return; }
+  localStorage.setItem('gramy_code_eleve', val);
+  const disp = document.getElementById('code-actuel-display');
+  disp.textContent = `Code actuel : ${val}`;
+  disp.classList.add('show');
+  ok.classList.add('show');
+  spawnCoins(3);
+  setTimeout(() => ok.classList.remove('show'), 3000);
+}
+
+function saveApiKey() {
+  const key = document.getElementById('api-key-input').value.trim();
+  if (!key) return;
+  localStorage.setItem('gramy_api_key', key);
+  alert('Clé API sauvegardée ✅');
+}
+
+async function generateWithIA() {
+  const instructions = document.getElementById('ia-instructions').value.trim();
+  const apiKey = localStorage.getItem('gramy_api_key') || '';
+  const msgEl = document.getElementById('ia-msg');
+  msgEl.classList.remove('show');
+  if (!apiKey) { msgEl.textContent = '❌ Veuillez d\'abord sauvegarder votre clé API.'; msgEl.classList.add('show'); return; }
+  if (!instructions) { msgEl.textContent = '❌ Veuillez renseigner les instructions.'; msgEl.classList.add('show'); return; }
+  msgEl.textContent = '⏳ Génération en cours...'; msgEl.classList.add('show');
+
+  const prompt = `Tu es un professeur d'anglais. Génère des exercices de grammaire anglaise pour des élèves de Terminale Bac Pro français selon ces instructions :
+${instructions}
+
+Réponds UNIQUEMENT avec un objet JSON valide (pas de texte avant ni après, pas de backticks), qui suit exactement ce format selon le type demandé :
+- QCM : { "id":"...", "phrase":"...", "options":["...","...","...","..."], "correct": 0, "explication":"..." }
+- Trous : { "id":"...", "phrase":"... ___ (infinitif) ...", "correct":"...", "explication":"..." }
+- Ordre : { "id":"...", "mots":["mot1","mot2",...], "correct":"phrase correcte", "explication":"..." }
+- Erreur : { "id":"...", "phrase":"...", "estCorrecte": true/false, "correction": "..." ou null, "explication":"..." }
+
+Génère un objet JSON avec cette structure :
+{
+  "themeData": {
+    "id": "identifiant-unique",
+    "title": "Titre court",
+    "titleFull": "Titre complet",
+    "lexique": "lexique indiqué",
+    "niveaux": [ { "niveau": N, "type": "...", "label": "...", "total": N, "exercices": [...] } ]
+  }
+}
+Les explications sont en français, simples, avec ✅ et ❌ exemples.`;
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
+      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 4000, messages: [{ role: 'user', content: prompt }] })
+    });
+    const data = await resp.json();
+    const text = data.content?.map(c => c.text || '').join('') || '';
+    const clean = text.replace(/```json|```/g, '').trim();
+    const parsed = JSON.parse(clean);
+    if (parsed.themeData) {
+      importThemeData(parsed.themeData);
+      msgEl.textContent = '✅ Exercices générés et intégrés ! Rechargez l\'application pour les voir.';
+      spawnCoins(5);
+    } else { throw new Error('Format invalide'); }
+  } catch (e) {
+    msgEl.textContent = '❌ Erreur : ' + e.message;
+  }
+}
+
+function importThemeData(themeData) {
+  const custom = JSON.parse(localStorage.getItem('gramy_exercices_custom') || '[]');
+  const idx = custom.findIndex(t => t.id === themeData.id);
+  if (idx >= 0) custom[idx] = themeData; else custom.push(themeData);
+  localStorage.setItem('gramy_exercices_custom', JSON.stringify(custom));
+}
+
+function importJSON() {
+  const raw = document.getElementById('json-import').value.trim();
+  const errEl = document.getElementById('json-import-error');
+  const okEl = document.getElementById('json-import-ok');
+  errEl.classList.remove('show'); okEl.classList.remove('show');
+  try {
+    const parsed = JSON.parse(raw);
+    importThemeData(parsed);
+    okEl.textContent = '✅ Exercices intégrés avec succès !';
+    okEl.classList.add('show');
+    spawnCoins(3);
+  } catch(e) {
+    errEl.textContent = '❌ JSON invalide : ' + e.message;
+    errEl.classList.add('show');
+  }
+}
+
+function loadElevesList() {
+  const container = document.getElementById('eleves-list');
+  const rows = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (!key.startsWith('gramy_eleve_')) continue;
+    try {
+      const d = JSON.parse(localStorage.getItem(key));
+      const total = calcGlobalScore(d);
+      rows.push(`<div class="eleve-row">
+        <span class="e-id">${d.prenom2}${d.nom2}</span>
+        <span class="e-class">${d.classe}</span>
+        <span class="e-score">Score global : ${total.pct}% (${total.done}/${total.total} ex.)</span>
+        <button class="btn btn-red btn-sm" onclick="resetEleveKey('${key}')">🗑️</button>
+      </div>`);
+    } catch(e) {}
+  }
+  container.innerHTML = rows.length ? rows.join('') : '<p style="color:#666;font-size:0.85rem;text-align:center;">Aucun élève enregistré sur cet appareil.</p>';
+}
+
+function calcGlobalScore(eleveData) {
+  let totalEx = 0, doneEx = 0, totalPts = 0, maxPts = 0;
+  getAllThemes().forEach(theme => {
+    theme.niveaux.forEach(niv => {
+      totalEx++;
+      const prog = eleveData.progression?.[theme.id]?.niveaux?.[niv.niveau];
+      if (prog?.fait) { doneEx++; totalPts += prog.meilleurScore || 0; maxPts += niv.total; }
+      else maxPts += niv.total;
+    });
+  });
+  return { done: doneEx, total: totalEx, pct: maxPts ? Math.round(totalPts / maxPts * 100) : 0 };
+}
+
+function resetAll() {
+  if (!confirm('⚠️ Supprimer TOUTES les données élèves ? Cette action est irréversible.')) return;
+  const keys = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k.startsWith('gramy_eleve_')) keys.push(k);
+  }
+  keys.forEach(k => localStorage.removeItem(k));
+  const ok = document.getElementById('reset-ok');
+  ok.textContent = '✅ Toutes les données ont été supprimées.';
+  ok.classList.add('show');
+  loadElevesList();
+  setTimeout(() => ok.classList.remove('show'), 3000);
+}
+
+function resetEleve() {
+  const id = document.getElementById('reset-eleve-id').value.trim().toUpperCase();
+  if (!id) return;
+  const key = 'gramy_eleve_' + id;
+  if (!localStorage.getItem(key)) { alert('Élève introuvable : ' + id); return; }
+  if (!confirm('Supprimer les données de ' + id + ' ?')) return;
+  localStorage.removeItem(key);
+  const ok = document.getElementById('reset-ok');
+  ok.textContent = '✅ Données de ' + id + ' supprimées.';
+  ok.classList.add('show');
+  loadElevesList();
+  setTimeout(() => ok.classList.remove('show'), 3000);
+}
+
+function resetEleveKey(key) {
+  if (!confirm('Supprimer cet élève ?')) return;
+  localStorage.removeItem(key);
+  loadElevesList();
+}
+
+// ─── AUTHENTIFICATION ÉLÈVE ─────────────────────────────────
+function checkEleveCode() {
+  const val = document.getElementById('eleve-code-input').value.trim().toUpperCase();
+  const stored = (localStorage.getItem('gramy_code_eleve') || '').toUpperCase();
+  const errEl = document.getElementById('eleve-code-error');
+  errEl.classList.remove('show');
+  if (!stored) {
+    errEl.textContent = '⚠️ Le professeur n\'a pas encore activé l\'accès élève.';
+    errEl.classList.add('show'); return;
+  }
+  if (val === stored) {
+    showPage('page-identification');
+  } else {
+    errEl.textContent = '❌ Code incorrect ! Waouh, réessaie !';
+    errEl.classList.add('show');
+    document.getElementById('eleve-code-input').value = '';
+  }
+}
+
+function identifierEleve() {
+  const p2 = document.getElementById('id-prenom').value.trim().toUpperCase();
+  const n2 = document.getElementById('id-nom').value.trim().toUpperCase();
+  const cl = document.getElementById('id-classe').value.trim().toUpperCase();
+  const errEl = document.getElementById('id-error');
+  errEl.classList.remove('show');
+  if (p2.length < 2 || n2.length < 2 || !cl) {
+    errEl.textContent = '❌ Remplis tous les champs (2 lettres min pour prénom et nom).';
+    errEl.classList.add('show'); return;
+  }
+  const key = `gramy_eleve_${p2}${n2}_${cl}`;
+  let data = JSON.parse(localStorage.getItem(key) || 'null');
+  if (!data) {
+    data = { prenom2: p2, nom2: n2, classe: cl, key, progression: {} };
+    localStorage.setItem(key, JSON.stringify(data));
+  }
+  currentEleve = data;
+  spawnCoins(3);
+  showPage('page-dashboard');
+  refreshDashboard();
+}
+
+function deconnecterEleve() {
+  currentEleve = null;
+  showPage('page-accueil');
+}
+
+// ─── TOUS LES THÈMES (embarqués + custom) ───────────────────
+function getAllThemes() {
+  const custom = JSON.parse(localStorage.getItem('gramy_exercices_custom') || '[]');
+  return [...EXERCISES_DATA.themes, ...custom];
+}
+
+// ─── DASHBOARD ÉLÈVE ────────────────────────────────────────
+function refreshDashboard() {
+  if (!currentEleve) return;
+  // Recharger depuis localStorage
+  currentEleve = JSON.parse(localStorage.getItem(currentEleve.key)) || currentEleve;
+  document.getElementById('dash-eleve-id').textContent =
+    `🎮 ${currentEleve.prenom2}${currentEleve.nom2}`;
+  document.getElementById('dash-eleve-classe').textContent = currentEleve.classe;
+  // XP global
+  const gs = calcGlobalScore(currentEleve);
+  const pct = gs.pct;
+  document.getElementById('dash-xp-bar').style.width = pct + '%';
+  document.getElementById('dash-xp-text').textContent = pct + '%';
+  // Grille thèmes
+  const grid = document.getElementById('themes-grid');
+  grid.innerHTML = '';
+  getAllThemes().forEach(theme => {
+    const prog = currentEleve.progression[theme.id] || {};
+    let doneNiv = 0, totalNiv = theme.niveaux.length;
+    let scoreSum = 0, scoreMax = 0;
+    theme.niveaux.forEach(niv => {
+      const p = prog.niveaux?.[niv.niveau];
+      if (p?.fait) { doneNiv++; scoreSum += p.meilleurScore || 0; }
+      scoreMax += niv.total;
+    });
+    const status = doneNiv === 0 ? '' : doneNiv === totalNiv ? 'completed' : 'in-progress';
+    const pctTheme = scoreMax ? Math.round(scoreSum / scoreMax * 100) : 0;
+    const dotsHtml = theme.niveaux.map(niv => {
+      const p = prog.niveaux?.[niv.niveau];
+      // verrouillé ?
+      const locked = niv.niveau > 1 && !prog.niveaux?.[niv.niveau - 1]?.fait;
+      if (locked) return `<span class="level-dot" title="Niveau ${niv.niveau} – verrouillé">🔒</span>`;
+      if (p?.fait) return `<span class="level-dot" title="Niveau ${niv.niveau} – terminé (${p.meilleurScore}/${niv.total})">✅</span>`;
+      return `<span class="level-dot" title="Niveau ${niv.niveau} – disponible">⭐</span>`;
+    }).join('');
+    const card = document.createElement('div');
+    card.className = `theme-card ${status}`;
+    card.innerHTML = `
+      <div class="theme-card-title">${theme.title}</div>
+      <div class="theme-card-lexique">📚 ${theme.lexique}</div>
+      <div class="levels-row">${dotsHtml}</div>
+      ${doneNiv > 0 ? `<div class="theme-score">🏆 ${pctTheme}% (${doneNiv}/${totalNiv} niveaux)</div>` : ''}
+    `;
+    card.onclick = () => openTheme(theme.id);
+    grid.appendChild(card);
+  });
+}
+
+// ─── PAGE THÈME ──────────────────────────────────────────────
+function openTheme(themeId) {
+  currentTheme = getAllThemes().find(t => t.id === themeId);
+  if (!currentTheme) return;
+  currentEleve = JSON.parse(localStorage.getItem(currentEleve.key)) || currentEleve;
+  document.getElementById('theme-page-title').textContent = currentTheme.titleFull;
+  document.getElementById('theme-page-lexique').textContent = '📚 ' + currentTheme.lexique;
+  const container = document.getElementById('levels-container');
+  container.innerHTML = '';
+  const prog = currentEleve.progression[themeId] || {};
+  currentTheme.niveaux.forEach(niv => {
+    const p = prog.niveaux?.[niv.niveau];
+    const locked = niv.niveau > 1 && !prog.niveaux?.[niv.niveau - 1]?.fait;
+    const done = p?.fait;
+    const icons = { qcm:'❓', trous:'✏️', ordre:'🔀', erreur:'🔍' };
+    const card = document.createElement('div');
+    card.className = `level-card ${locked ? 'locked' : ''} ${done ? 'done' : ''}`;
+    card.innerHTML = `
+      <div class="level-icon">${locked ? '🔒' : done ? '✅' : icons[niv.type] || '⭐'}</div>
+      <div class="level-name">NIVEAU ${niv.niveau}</div>
+      <div class="level-type">${niv.label}</div>
+      ${done ? `<div class="level-score">🏆 ${p.meilleurScore}/${niv.total}</div>` : ''}
+      ${!locked && !done ? '<div class="level-type" style="color:var(--mario-yellow);margin-top:6px;">Cliquer pour commencer</div>' : ''}
+      ${!locked && done ? '<div class="level-type" style="color:#aaa;margin-top:6px;font-size:0.75rem;">Refaire disponible</div>' : ''}
+    `;
+    if (!locked) card.onclick = () => startNiveau(themeId, niv.niveau);
+    container.appendChild(card);
+  });
+  showPage('page-theme');
+}
+
+// ─── DÉMARRER UN NIVEAU ──────────────────────────────────────
+function startNiveau(themeId, niveauNum) {
+  currentTheme = getAllThemes().find(t => t.id === themeId);
+  currentNiveau = currentTheme.niveaux.find(n => n.niveau === niveauNum);
+  currentExIndex = 0;
+  currentReponses = [];
+  currentScore = 0;
+  validated = false;
+  document.getElementById('ex-theme-label').textContent =
+    `${currentTheme.title} – Niveau ${niveauNum}`;
+  showPage('page-exercice');
+  renderQuestion();
+}
+
+// ─── RENDU D'UNE QUESTION ───────────────────────────────────
+function renderQuestion() {
+  validated = false;
+  ordreBuilt = [];
+  ordreBank = [];
+  erreurVerdict = null;
+  erreurCorrInput = '';
+  const ex = currentNiveau.exercices[currentExIndex];
+  const total = currentNiveau.exercices.length;
+  document.getElementById('ex-progress-label').textContent =
+    `Question ${currentExIndex + 1}/${total}`;
+  document.getElementById('ex-score-live').textContent =
+    `🪙 ${currentScore} pts`;
+  const pct = Math.round((currentExIndex / total) * 100);
+  document.getElementById('ex-progress-bar').style.width = pct + '%';
+  // Boutons action
+  document.getElementById('btn-valider').style.display = 'inline-block';
+  document.getElementById('btn-suivant').style.display = 'none';
+  const area = document.getElementById('ex-question-area');
+  area.innerHTML = '';
+  switch (currentNiveau.type) {
+    case 'qcm':    renderQCM(ex, area); break;
+    case 'trous':  renderTrous(ex, area); break;
+    case 'ordre':  renderOrdre(ex, area); break;
+    case 'erreur': renderErreur(ex, area); break;
+  }
+}
+
+// ── QCM ─────────────────────────────────────────────────────
+function renderQCM(ex, area) {
+  const letters = ['A','B','C','D'];
+  area.innerHTML = `
+    <div class="question-card">
+      <div class="question-text">${highlightBlanks(ex.phrase)}</div>
+      <div class="options-list" id="options-list">
+        ${ex.options.map((opt, i) => `
+          <button class="option-btn" id="opt-${i}" onclick="selectOption(${i})">
+            <span class="option-letter">${letters[i]}</span>${opt}
+          </button>`).join('')}
+      </div>
+      <div class="explication-box" id="expl-box">
+        <div class="ex-label">💡 EXPLICATION</div>
+        <div id="expl-text"></div>
+      </div>
+    </div>`;
+}
+
+function selectOption(idx) {
+  if (validated) return;
+  document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+  document.getElementById('opt-' + idx).classList.add('selected');
+}
+
+// ── TROUS ────────────────────────────────────────────────────
+function renderTrous(ex, area) {
+  // Remplacer ___ par un input
+  const phraseHtml = ex.phrase.replace(/___/g,
+    `<input class="trous-input" id="trous-inp" type="text" placeholder="..." autocomplete="off" />`);
+  area.innerHTML = `
+    <div class="question-card">
+      <div class="question-text" style="line-height:2.2;">${phraseHtml}</div>
+      <div class="explication-box" id="expl-box">
+        <div class="ex-label">💡 EXPLICATION</div>
+        <div id="expl-text"></div>
+      </div>
+    </div>`;
+}
+
+// ── ORDRE ────────────────────────────────────────────────────
+function renderOrdre(ex, area) {
+  // Mélanger les mots
+  ordreBank = [...ex.mots].sort(() => Math.random() - 0.5);
+  ordreBuilt = [];
+  area.innerHTML = `
+    <div class="question-card">
+      <p style="font-size:0.85rem;color:#aaa;margin-bottom:12px;">Remets les mots dans le bon ordre :</p>
+      <div class="sentence-build" id="sentence-build"></div>
+      <p style="font-size:0.8rem;color:#aaa;margin:8px 0 4px;">Mots disponibles :</p>
+      <div class="words-bank" id="words-bank"></div>
+      <div class="explication-box" id="expl-box">
+        <div class="ex-label">💡 EXPLICATION</div>
+        <div id="expl-text"></div>
+      </div>
+    </div>`;
+  renderOrdreUI();
+}
+
+function renderOrdreUI() {
+  const bank = document.getElementById('words-bank');
+  const built = document.getElementById('sentence-build');
+  if (!bank || !built) return;
+  bank.innerHTML = '';
+  built.innerHTML = '';
+  ordreBank.forEach((mot, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'word-chip';
+    btn.textContent = mot;
+    btn.onclick = () => { ordreBuilt.push(mot); ordreBank.splice(i, 1); renderOrdreUI(); };
+    bank.appendChild(btn);
+  });
+  ordreBuilt.forEach((mot, i) => {
+    const chip = document.createElement('button');
+    chip.className = 'placed-chip';
+    chip.textContent = mot;
+    chip.onclick = () => { ordreBank.push(mot); ordreBuilt.splice(i, 1); renderOrdreUI(); };
+    built.appendChild(chip);
+  });
+  if (!ordreBuilt.length) {
+    built.innerHTML = '<span style="color:#444;font-size:0.8rem;">Clique sur les mots pour les placer ici...</span>';
+  }
+}
+
+// ── ERREUR ───────────────────────────────────────────────────
+function renderErreur(ex, area) {
+  area.innerHTML = `
+    <div class="question-card">
+      <p style="font-size:0.85rem;color:#aaa;margin-bottom:10px;">Cette phrase est-elle correcte ?</p>
+      <div class="question-text">"${ex.phrase}"</div>
+      <div class="erreur-btns" style="margin-top:16px;">
+        <button class="erreur-verdict" id="verd-correct" onclick="selectVerdict('correct')">✅ Correcte</button>
+        <button class="erreur-verdict" id="verd-incorrect" onclick="selectVerdict('incorrect')">❌ Incorrecte</button>
+      </div>
+      <div class="correction-input-wrap" id="corr-wrap">
+        <p class="correction-hint">Quelle est la correction ?</p>
+        <input class="mario-input" type="text" id="corr-input" placeholder="Écris la phrase correcte..."
+          style="letter-spacing:0.5px;" oninput="erreurCorrInput=this.value" />
+      </div>
+      <div class="explication-box" id="expl-box">
+        <div class="ex-label">💡 EXPLICATION</div>
+        <div id="expl-text"></div>
+      </div>
+    </div>`;
+}
+
+function selectVerdict(v) {
+  if (validated) return;
+  erreurVerdict = v;
+  document.getElementById('verd-correct').className = 'erreur-verdict' + (v === 'correct' ? ' selected-correct' : '');
+  document.getElementById('verd-incorrect').className = 'erreur-verdict' + (v === 'incorrect' ? ' selected-incorrect' : '');
+  const wrap = document.getElementById('corr-wrap');
+  wrap.classList.toggle('show', v === 'incorrect');
+}
+
+// ── VALIDATION ───────────────────────────────────────────────
+function validerReponse() {
+  if (validated) return;
+  validated = true;
+  const ex = currentNiveau.exercices[currentExIndex];
+  let correct = false;
+  let reponseEleve = '';
+
+  switch (currentNiveau.type) {
+    case 'qcm': {
+      const sel = document.querySelector('.option-btn.selected');
+      if (!sel) { validated = false; showMsg('Sélectionne une réponse !'); return; }
+      const idx = parseInt(sel.id.replace('opt-', ''));
+      reponseEleve = ex.options[idx];
+      correct = idx === ex.correct;
+      // Colorer options
+      document.querySelectorAll('.option-btn').forEach((b, i) => {
+        b.disabled = true;
+        if (i === ex.correct) b.classList.add('correct');
+        else if (i === idx && !correct) b.classList.add('wrong');
+      });
+      break;
+    }
+    case 'trous': {
+      const inp = document.getElementById('trous-inp');
+      if (!inp || !inp.value.trim()) { validated = false; showMsg('Écris ta réponse !'); return; }
+      reponseEleve = inp.value.trim();
+      correct = reponseEleve.toLowerCase() === ex.correct.toLowerCase();
+      inp.disabled = true;
+      inp.classList.add(correct ? 'correct' : 'wrong');
+      if (!correct) {
+        const hint = document.createElement('p');
+        hint.style.cssText = 'color:var(--mario-green);font-weight:700;margin-top:6px;font-size:0.9rem;';
+        hint.textContent = '✅ Réponse : ' + ex.correct;
+        inp.parentNode.insertBefore(hint, inp.nextSibling);
+      }
+      break;
+    }
+    case 'ordre': {
+      if (ordreBuilt.length === 0) { validated = false; showMsg('Place au moins un mot !'); return; }
+      reponseEleve = ordreBuilt.join(' ');
+      correct = reponseEleve.trim().toLowerCase() === ex.correct.trim().toLowerCase();
+      // Afficher résultat
+      const built = document.getElementById('sentence-build');
+      if (built) {
+        built.innerHTML = '';
+        ordreBuilt.forEach(mot => {
+          const chip = document.createElement('span');
+          chip.className = 'placed-chip';
+          chip.style.background = correct ? 'var(--mario-green)' : 'var(--mario-red)';
+          chip.style.boxShadow = correct ? '3px 3px 0px #1a5c1e' : '3px 3px 0px #8B0000';
+          chip.textContent = mot;
+          built.appendChild(chip);
+        });
+        if (!correct) {
+          const hint = document.createElement('p');
+          hint.style.cssText = 'color:var(--mario-green);font-weight:700;margin-top:10px;font-size:0.9rem;width:100%;';
+          hint.textContent = '✅ Ordre correct : ' + ex.correct;
+          built.appendChild(hint);
+        }
+      }
+      break;
+    }
+    case 'erreur': {
+      if (!erreurVerdict) { validated = false; showMsg('Choisis : correcte ou incorrecte !'); return; }
+      const verdictOk = (erreurVerdict === 'correct' && ex.estCorrecte) ||
+                        (erreurVerdict === 'incorrect' && !ex.estCorrecte);
+      // Pour le score : on valide si le verdict + correction (si incorrect) est juste
+      reponseEleve = erreurVerdict === 'incorrect'
+        ? `Incorrecte → "${erreurCorrInput}"`
+        : 'Correcte';
+      correct = verdictOk;
+      // Si incorrect ET correction fournie, bonus si proche
+      if (!ex.estCorrecte && erreurVerdict === 'incorrect') {
+        const corrInput = document.getElementById('corr-input');
+        if (corrInput) corrInput.disabled = true;
+      }
+      // Afficher résultat verdict
+      ['verd-correct','verd-incorrect'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.disabled = true;
+      });
+      if (!correct) {
+        const v = document.getElementById('verd-' + erreurVerdict);
+        if (v) { v.style.borderColor = 'var(--mario-red)'; v.style.background = 'rgba(229,37,33,0.15)'; }
+      }
+      break;
+    }
+  }
+
+  if (correct) { currentScore++; spawnCoins(2); }
+  // Enregistrer réponse
+  currentReponses.push({
+    ex, reponseEleve,
+    correct,
+    explication: ex.explication
+  });
+
+  // Afficher explication
+  const explBox = document.getElementById('expl-box');
+  const explText = document.getElementById('expl-text');
+  if (explBox && explText) {
+    explBox.classList.add('show');
+    explText.innerHTML = (correct ? '✅ ' : '❌ ') + ex.explication;
+    explBox.style.borderColor = correct ? 'var(--mario-green)' : 'var(--mario-red)';
+    explBox.style.background = correct
+      ? 'rgba(67,176,71,0.1)' : 'rgba(229,37,33,0.1)';
+  }
+
+  document.getElementById('btn-valider').style.display = 'none';
+  document.getElementById('btn-suivant').style.display = 'inline-block';
+  document.getElementById('ex-score-live').textContent = `🪙 ${currentScore} pts`;
+}
+
+function showMsg(msg) {
+  // Petit toast temporaire
+  const t = document.createElement('div');
+  t.className = 'msg-box msg-warn show';
+  t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:9999;width:auto;white-space:nowrap;';
+  t.textContent = '⚠️ ' + msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2000);
+}
+
+function questionSuivante() {
+  currentExIndex++;
+  if (currentExIndex >= currentNiveau.exercices.length) {
+    finExercice();
+  } else {
+    renderQuestion();
+    window.scrollTo(0, 0);
+  }
+}
+
+// ─── FIN D'EXERCICE ──────────────────────────────────────────
+function finExercice() {
+  const total = currentNiveau.exercices.length;
+  const pct = Math.round((currentScore / total) * 100);
+  // Sauvegarder progression
+  if (!currentEleve.progression[currentTheme.id]) {
+    currentEleve.progression[currentTheme.id] = { niveaux: {} };
+  }
+  const prev = currentEleve.progression[currentTheme.id].niveaux[currentNiveau.niveau] || {};
+  const meilleur = Math.max(prev.meilleurScore || 0, currentScore);
+  const tentatives = (prev.tentatives || 0) + 1;
+  currentEleve.progression[currentTheme.id].niveaux[currentNiveau.niveau] = {
+    fait: true,
+    score: currentScore,
+    meilleurScore: meilleur,
+    tentatives,
+    total,
+    reponses: currentReponses
+  };
+  localStorage.setItem(currentEleve.key, JSON.stringify(currentEleve));
+
+  // Affichage score
+  showPage('page-score');
+  document.getElementById('score-fraction').textContent = `${currentScore}/${total}`;
+  // Étoiles
+  let stars = pct >= 80 ? '⭐⭐⭐' : pct >= 50 ? '⭐⭐' : '⭐';
+  document.getElementById('score-stars').textContent = stars;
+  // Emoji & message
+  let emoji, msg;
+  if (pct >= 80) {
+    emoji = '🏆'; msg = 'Excellent ! Tu es un champion !';
+    spawnConfetti(); spawnCoins(8);
+  } else if (pct >= 50) {
+    emoji = '⭐'; msg = 'Bien joué ! Continue comme ça !';
+    spawnCoins(4);
+  } else {
+    emoji = '🍄'; msg = 'Courage ! Relis la correction et réessaie !';
+  }
+  document.getElementById('score-emoji').textContent = emoji;
+  document.getElementById('score-msg').textContent = msg;
+  document.getElementById('score-big').style.color =
+    pct >= 80 ? 'var(--mario-yellow)' : pct >= 50 ? 'var(--mario-green)' : 'var(--mario-red)';
+
+  // Retry si < 50%
+  const retryBox = document.getElementById('retry-box');
+  retryBox.classList.toggle('show', pct < 50);
+
+  // Corrections détail
+  const corrDiv = document.getElementById('corrections-detail');
+  corrDiv.innerHTML = currentReponses.map((r, i) => {
+    const isW = !r.correct;
+    const q = r.ex.phrase || (r.ex.mots ? r.ex.mots.join(' / ') : '');
+    const rep = r.reponseEleve || '(aucune réponse)';
+    const ok = r.ex.correct !== undefined
+      ? (Array.isArray(r.ex.options) ? r.ex.options[r.ex.correct] : r.ex.correct)
+      : r.ex.correct !== undefined ? r.ex.correct : '';
+    return `<div class="correction-item ${isW ? 'wrong' : ''}">
+      <div class="corr-q">${i+1}. ${q}</div>
+      <div class="corr-given">Ta réponse : <span class="${r.correct ? 'ok' : ''}">${rep}</span>
+        ${isW && ok ? ` → Correct : <span class="ok">${ok}</span>` : ''}</div>
+      <div class="corr-expl">💡 ${r.explication}</div>
+    </div>`;
+  }).join('');
+}
+
+function retryExercise() {
+  startNiveau(currentTheme.id, currentNiveau.niveau);
+}
+
+function retourTheme() {
+  openTheme(currentTheme.id);
+}
+
+function confirmLeaveExercise() {
+  if (currentExIndex > 0) {
+    if (!confirm('Quitter l\'exercice ? Ta progression sera perdue.')) return;
+  }
+  openTheme(currentTheme.id);
+}
+
+// ─── FICHE BILAN ─────────────────────────────────────────────
+function showBilan() {
+  if (!currentEleve) return;
+  currentEleve = JSON.parse(localStorage.getItem(currentEleve.key)) || currentEleve;
+  document.getElementById('bilan-eleve-id').textContent =
+    `🎮 ${currentEleve.prenom2}${currentEleve.nom2}`;
+  document.getElementById('bilan-eleve-classe').textContent = currentEleve.classe;
+  document.getElementById('bilan-print-header').textContent =
+    `Élève : ${currentEleve.prenom2}${currentEleve.nom2} | Classe : ${currentEleve.classe} | Date : ${new Date().toLocaleDateString('fr-FR')}`;
+
+  const content = document.getElementById('bilan-content');
+  content.innerHTML = '';
+  let globalPts = 0, globalMax = 0;
+
+  getAllThemes().forEach(theme => {
+    const prog = currentEleve.progression[theme.id];
+    if (!prog) return;
+    let hasData = false;
+    theme.niveaux.forEach(niv => { if (prog.niveaux?.[niv.niveau]?.fait) hasData = true; });
+    if (!hasData) return;
+
+    let themeHTML = `<div class="bilan-section">
+      <div class="bilan-theme-title">📚 ${theme.titleFull} – ${theme.lexique}</div>`;
+    let themePts = 0, themeMax = 0;
+
+    theme.niveaux.forEach(niv => {
+      const p = prog.niveaux?.[niv.niveau];
+      if (!p?.fait) return;
+      themePts += p.meilleurScore || 0;
+      themeMax += niv.total;
+      globalPts += p.meilleurScore || 0;
+      globalMax += niv.total;
+      const pctN = niv.total ? Math.round((p.meilleurScore || 0) / niv.total * 100) : 0;
+      themeHTML += `<div class="bilan-niveau-title">Niveau ${niv.niveau} – ${niv.label} | Score : ${p.meilleurScore}/${niv.total} (${pctN}%) | Tentatives : ${p.tentatives}</div>`;
+      if (p.reponses?.length) {
+        p.reponses.forEach((r, i) => {
+          const q = r.ex?.phrase || (r.ex?.mots?.join(' ') ?? '');
+          const rep = r.reponseEleve || '';
+          const corr = r.ex?.options
+            ? r.ex.options[r.ex.correct]
+            : (r.ex?.correct ?? '');
+          const ok = r.correct ? '✅' : '❌';
+          themeHTML += `<div class="bilan-item">
+            <strong>${i+1}.</strong> ${q}<br>
+            Ta réponse : ${ok} ${rep}
+            ${!r.correct && corr ? ` | Correction : ${corr}` : ''}<br>
+            <em style="color:#80d4ff;">💡 ${r.explication}</em>
+          </div>`;
+        });
+      }
+    });
+
+    const pctTheme = themeMax ? Math.round(themePts / themeMax * 100) : 0;
+    themeHTML += `<div style="margin-top:14px;font-weight:900;color:var(--mario-green);">
+      Score thème : ${themePts}/${themeMax} (${pctTheme}%)</div></div>`;
+    content.innerHTML += themeHTML;
+  });
+
+  if (!content.innerHTML) {
+    content.innerHTML = `<div class="bilan-section" style="text-align:center;">
+      <p style="color:#666;">Aucun exercice complété pour l'instant. Lance-toi ! 🎮</p></div>`;
+  } else {
+    const pctGlobal = globalMax ? Math.round(globalPts / globalMax * 100) : 0;
+    content.innerHTML += `<div class="bilan-section" style="text-align:center;border-color:var(--mario-yellow);">
+      <div style="font-family:'Press Start 2P',monospace;font-size:0.7rem;color:var(--mario-yellow);">
+        🏆 SCORE GLOBAL : ${globalPts}/${globalMax} (${pctGlobal}%)
+      </div></div>`;
+  }
+  showPage('page-bilan');
+}
+
+// ─── UTILITAIRES ─────────────────────────────────────────────
+function highlightBlanks(phrase) {
+  return phrase.replace(/___/g, '<span class="blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>');
+}
+
+// ─── INIT ─────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  initStars();
+});
+</script>
+// 
