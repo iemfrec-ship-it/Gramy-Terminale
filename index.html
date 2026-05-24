@@ -252,10 +252,11 @@
       <button class="back-btn" onclick="showPage('page-accueil')">← Accueil</button>
       <div class="prof-tabs">
         <button class="prof-tab active" onclick="switchProfTab(this,'tab-code')">🔑 Code élève</button>
-        <button class="prof-tab" onclick="switchProfTab(this,'tab-eleves')">📊 Élèves</button>
         <button class="prof-tab" onclick="switchProfTab(this,'tab-ajout')">➕ Exercices</button>
         <button class="prof-tab" onclick="switchProfTab(this,'tab-reset')">🗑️ Reset</button>
       </div>
+
+      <!-- TAB CODE -->
       <div class="tab-content active" id="tab-code">
         <div class="card" style="max-width:100%;">
           <p class="card-title">🔑 Code d'accès élève</p>
@@ -268,43 +269,85 @@
           <button class="btn btn-green btn-full" onclick="saveEleveCode()">Enregistrer 💾</button>
         </div>
       </div>
-      <div class="tab-content" id="tab-eleves">
-        <div class="card" style="max-width:100%;">
-          <p class="card-title">📊 Suivi des élèves</p>
-          <div id="eleves-list"><p style="color:#666;font-size:0.85rem;text-align:center;">Aucun élève enregistré.</p></div>
-          <div style="margin-top:16px;"><button class="btn btn-blue btn-sm" onclick="window.print()">🖨️ Imprimer</button></div>
-        </div>
-      </div>
+
+      <!-- TAB EXERCICES -->
       <div class="tab-content" id="tab-ajout">
         <div class="card" style="max-width:100%;">
           <p class="card-title">➕ Ajouter des exercices</p>
-          <div style="margin-bottom:24px;">
-            <p style="font-family:'Press Start 2P',monospace;font-size:0.55rem;color:var(--mario-blue);margin-bottom:12px;">Méthode A – Génération par IA (Claude API)</p>
-            <div class="input-group">
-              <label>Clé API Claude (sk-ant-...)</label>
-              <input class="mario-input" type="password" id="api-key-input" placeholder="sk-ant-api03-..." style="letter-spacing:1px;"/>
-              <button class="btn btn-sm btn-outline" style="margin-top:6px;" onclick="saveApiKey()">💾 Sauvegarder la clé</button>
-            </div>
-            <div class="input-group">
-              <label>Instructions pour les exercices</label>
-              <textarea class="json-area" id="ia-instructions" rows="7" placeholder="Exemple :&#10;Thème : Present perfect, forme affirmative&#10;Lexique : les voyages&#10;Niveau : 1&#10;Type : QCM&#10;Nombre de phrases : 15"></textarea>
-            </div>
-            <div class="msg-box msg-info" id="ia-msg"></div>
-            <button class="btn btn-yellow btn-full" onclick="generateWithIA()">✨ Générer avec l'IA</button>
+
+          <!-- Workflow info -->
+          <div style="background:rgba(4,156,216,0.1);border:2px solid var(--mario-blue);border-radius:8px;padding:16px;margin-bottom:20px;">
+            <p style="font-family:'Press Start 2P',monospace;font-size:0.5rem;color:var(--mario-blue);margin-bottom:10px;">Workflow en 4 étapes :</p>
+            <ol style="color:#aaa;font-size:0.85rem;line-height:2;padding-left:18px;">
+              <li>Remplissez le formulaire ci-dessous &amp; cliquez <em>Générer le prompt</em></li>
+              <li>Copiez le prompt et envoyez-le à Claude dans votre conversation</li>
+              <li>Claude vous renvoie un JSON → copiez-le</li>
+              <li>Collez-le dans la zone ci-dessous → cliquez Intégrer</li>
+            </ol>
           </div>
+
+          <!-- Formulaire -->
+          <div class="input-group">
+            <label>THÈME CIBLE</label>
+            <select class="mario-input" id="gen-theme" style="cursor:pointer;">
+              <option value="present-simple-affirmatif">Présent simple – Forme affirmative</option>
+              <option value="present-simple-negatif">Présent simple – Forme négative</option>
+              <option value="present-simple-interrogatif">Présent simple – Forme interrogative</option>
+              <option value="preterit-affirmatif">Prétérit – Forme affirmative</option>
+              <option value="preterit-negatif">Prétérit – Forme négative</option>
+              <option value="preterit-interrogatif">Prétérit – Forme interrogative</option>
+              <option value="nouveau">➕ Nouveau thème (préciser dans consignes)</option>
+            </select>
+          </div>
+
+          <div class="input-group">
+            <label>NIVEAU / TYPE D'EXERCICE</label>
+            <select class="mario-input" id="gen-niveau" style="cursor:pointer;">
+              <option value="1-qcm">Niveau 1 – QCM (4 choix)</option>
+              <option value="2-trous">Niveau 2 – Phrases à trous</option>
+              <option value="3-ordre">Niveau 3 – Remettre dans l'ordre</option>
+              <option value="4-erreur">Niveau 4 – Trouver l'erreur</option>
+            </select>
+          </div>
+
+          <div class="input-group">
+            <label>SUJET ET CONSIGNES POUR CLAUDE</label>
+            <textarea class="json-area" id="gen-consignes" rows="4"
+              placeholder="ex: Créer des questions sur le futur simple avec le vocabulaire de l'environnement (pollution, recyclage...). Public : élèves de bac pro Terminale." style="color:white;"></textarea>
+          </div>
+
+          <div class="input-group">
+            <label>NOMBRE DE QUESTIONS</label>
+            <select class="mario-input" id="gen-nb" style="cursor:pointer;">
+              <option value="10">10 questions</option>
+              <option value="15" selected>15 questions</option>
+              <option value="20">20 questions</option>
+            </select>
+          </div>
+
+          <button class="btn btn-yellow btn-full" style="margin-bottom:16px;" onclick="genererPrompt()">📋 Générer le prompt pour Claude</button>
+
+          <div class="msg-box msg-success" id="prompt-copie-ok">✅ Prompt copié dans le presse-papiers !</div>
+
+          <div id="prompt-result-wrap" style="display:none;margin-bottom:20px;">
+            <label style="display:block;font-size:0.85rem;color:#aaa;font-weight:700;margin-bottom:6px;">PROMPT GÉNÉRÉ – Copiez et envoyez à Claude :</label>
+            <textarea class="json-area" id="prompt-result" rows="8" readonly style="color:#FBD000;cursor:text;"></textarea>
+            <button class="btn btn-blue btn-sm" style="margin-top:6px;" onclick="copierPrompt()">📋 Copier le prompt</button>
+          </div>
+
           <div class="section-sep"></div>
-          <div>
-            <p style="font-family:'Press Start 2P',monospace;font-size:0.55rem;color:var(--mario-green);margin-bottom:12px;">Méthode B – Import JSON manuel</p>
-            <div class="input-group">
-              <label>Coller le JSON ici</label>
-              <textarea class="json-area" id="json-import" rows="8" placeholder='{ "id": "...", "title": "...", ... }'></textarea>
-            </div>
-            <div class="msg-box msg-error" id="json-import-error"></div>
-            <div class="msg-box msg-success" id="json-import-ok"></div>
-            <button class="btn btn-green btn-full" onclick="importJSON()">📥 Valider et intégrer</button>
+
+          <div class="input-group">
+            <label>COLLER LE JSON RENVOYÉ PAR CLAUDE :</label>
+            <textarea class="json-area" id="json-import" rows="8" placeholder="Collez ici le JSON que Claude vous a fourni…"></textarea>
           </div>
+          <div class="msg-box msg-error" id="json-import-error"></div>
+          <div class="msg-box msg-success" id="json-import-ok"></div>
+          <button class="btn btn-green btn-full" onclick="importJSON()">📥 Intégrer les exercices</button>
         </div>
       </div>
+
+      <!-- TAB RESET -->
       <div class="tab-content" id="tab-reset">
         <div class="card" style="max-width:100%;">
           <p class="card-title">🗑️ Réinitialisation</p>
@@ -970,10 +1013,7 @@ function checkProfCode(){
 function loadProfDashboard(){
   const code=localStorage.getItem('gramy_code_eleve')||'';
   const disp=document.getElementById('code-actuel-display');
-  disp.textContent=code?`Code actuel : ${code}`:'Aucun code défini';
-  const key=localStorage.getItem('gramy_api_key')||'';
-  if(key)document.getElementById('api-key-input').value=key;
-  loadElevesList();
+  if(disp)disp.textContent=code?`Code actuel : ${code}`:'Aucun code défini';
 }
 
 function switchProfTab(btn,tabId){
@@ -991,6 +1031,69 @@ function saveEleveCode(){
   document.getElementById('code-actuel-display').textContent=`Code actuel : ${val}`;
   ok.classList.add('show');spawnCoins(3);
   setTimeout(()=>ok.classList.remove('show'),3000);
+}
+
+function genererPrompt(){
+  const themeVal=document.getElementById('gen-theme').value;
+  const themeLabel=document.getElementById('gen-theme').options[document.getElementById('gen-theme').selectedIndex].text;
+  const niveauVal=document.getElementById('gen-niveau').value;
+  const niveauLabel=document.getElementById('gen-niveau').options[document.getElementById('gen-niveau').selectedIndex].text;
+  const consignes=document.getElementById('gen-consignes').value.trim();
+  const nb=document.getElementById('gen-nb').value;
+  const [niv,type]=niveauVal.split('-');
+  const typeInstructions={
+    qcm:`QCM avec 4 options (A, B, C, D), 1 seule bonne réponse. Champ "correct" = index (0-3) de la bonne réponse.`,
+    trous:`Phrases à trous. Le mot manquant est remplacé par ___ dans la phrase. Ajouter l'infinitif entre parenthèses comme indice ex: ___ (to be). Champ "correct" = la forme correcte du mot.`,
+    ordre:`Remettre les mots dans l'ordre. Champ "mots" = tableau des mots mélangés. Champ "correct" = la phrase correcte complète.`,
+    erreur:`Trouver l'erreur. Environ la moitié des phrases sont correctes, l'autre moitié incorrectes. Champ "estCorrecte" = true/false. Champ "correction" = null si correcte, sinon la phrase corrigée.`
+  };
+  const jsonExemple={
+    qcm:`{"id":"xx-1","phrase":"She ___ to work.","options":["go","goes","going","gone"],"correct":1,"explication":"She = he/she/it → goes. ✅ goes."}`,
+    trous:`{"id":"xx-1","phrase":"She ___ (go) to work.","correct":"goes","explication":"She = he/she/it → goes. ✅ goes."}`,
+    ordre:`{"id":"xx-1","mots":["work","She","to","goes"],"correct":"She goes to work.","explication":"Sujet + verbe + complément."}`,
+    erreur:`{"id":"xx-1","phrase":"She go to work.","estCorrecte":false,"correction":"She goes to work.","explication":"She = he/she/it → goes. ✅ goes."}`
+  };
+  const prompt=`Tu es professeur d'anglais. Génère ${nb} exercices de grammaire anglaise pour des élèves de Terminale Bac Pro français.
+
+THÈME GRAMMATICAL : ${themeLabel}
+TYPE D'EXERCICE : ${niveauLabel}
+CONSIGNES SPÉCIFIQUES : ${consignes||'Aucune consigne particulière. Utilise un vocabulaire professionnel varié.'}
+
+INSTRUCTIONS POUR CE TYPE :
+${typeInstructions[type]}
+
+Les explications sont en français, courtes et claires, avec ✅ exemple correct et si possible ❌ exemple incorrect.
+
+RÉPONDS UNIQUEMENT avec un objet JSON valide, sans texte avant ni après, sans backticks, avec cette structure exacte :
+{
+  "id": "${themeVal}-niveau${niv}-custom",
+  "title": "${themeLabel}",
+  "titleFull": "${themeLabel}",
+  "lexique": "à préciser selon tes phrases",
+  "niveaux": [
+    {
+      "niveau": ${niv},
+      "type": "${type}",
+      "label": "${niveauLabel.split('–')[1].trim()}",
+      "total": ${nb},
+      "exercices": [
+        ${jsonExemple[type]},
+        ... (${nb} exercices au total)
+      ]
+    }
+  ]
+}`;
+  document.getElementById('prompt-result').value=prompt;
+  document.getElementById('prompt-result-wrap').style.display='block';
+  window.scrollTo({top:document.getElementById('prompt-result-wrap').offsetTop-20,behavior:'smooth'});
+}
+
+function copierPrompt(){
+  const txt=document.getElementById('prompt-result').value;
+  navigator.clipboard.writeText(txt).then(()=>{
+    const ok=document.getElementById('prompt-copie-ok');ok.classList.add('show');
+    setTimeout(()=>ok.classList.remove('show'),3000);
+  }).catch(()=>{document.getElementById('prompt-result').select();document.execCommand('copy');});
 }
 
 function saveApiKey(){
