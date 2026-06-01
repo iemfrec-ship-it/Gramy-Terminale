@@ -251,22 +251,41 @@
     <div style="width:100%;max-width:800px;">
       <button class="back-btn" onclick="showPage('page-accueil')">← Accueil</button>
       <div class="prof-tabs">
-        <button class="prof-tab active" onclick="switchProfTab(this,'tab-code')">🔑 Code élève</button>
+        <button class="prof-tab active" onclick="switchProfTab(this,'tab-codes')">🔑 Codes d'accès</button>
         <button class="prof-tab" onclick="switchProfTab(this,'tab-ajout')">➕ Exercices</button>
-        <button class="prof-tab" onclick="switchProfTab(this,'tab-reset')">🗑️ Reset</button>
       </div>
 
-      <!-- TAB CODE -->
-      <div class="tab-content active" id="tab-code">
+      <!-- TAB CODES -->
+      <div class="tab-content active" id="tab-codes">
         <div class="card" style="max-width:100%;">
-          <p class="card-title">🔑 Code d'accès élève</p>
+          <p class="card-title">🔑 Codes d'accès</p>
+
+          <!-- Code élève -->
+          <p style="font-family:'Press Start 2P',monospace;font-size:0.55rem;color:var(--mario-blue);margin-bottom:12px;">Code élève</p>
           <div class="msg-box msg-info show" id="code-actuel-display">Aucun code défini</div>
-          <div class="input-group" style="margin-top:16px;">
-            <label>Nouveau code (4-8 caractères)</label>
+          <div class="input-group" style="margin-top:12px;">
+            <label>Nouveau code élève (4-8 caractères)</label>
             <input class="mario-input" type="text" id="new-eleve-code" placeholder="ex: MARIO" maxlength="8"/>
           </div>
-          <div class="msg-box msg-success" id="code-save-ok">✅ Code enregistré !</div>
+          <div class="msg-box msg-success" id="code-save-ok">✅ Code élève enregistré !</div>
           <button class="btn btn-green btn-full" onclick="saveEleveCode()">Enregistrer 💾</button>
+
+          <div class="section-sep"></div>
+
+          <!-- Code prof -->
+          <p style="font-family:'Press Start 2P',monospace;font-size:0.55rem;color:var(--mario-red);margin-bottom:12px;">Code professeur</p>
+          <div class="msg-box msg-info show" id="code-prof-display">Code actuel : 0504</div>
+          <div class="input-group" style="margin-top:12px;">
+            <label>Nouveau code prof (4-8 chiffres ou lettres)</label>
+            <input class="mario-input" type="password" id="new-prof-code" placeholder="ex: 1234" maxlength="8"/>
+          </div>
+          <div class="input-group">
+            <label>Confirmer le nouveau code</label>
+            <input class="mario-input" type="password" id="new-prof-code-confirm" placeholder="ex: 1234" maxlength="8"/>
+          </div>
+          <div class="msg-box msg-error" id="code-prof-error"></div>
+          <div class="msg-box msg-success" id="code-prof-ok">✅ Code professeur enregistré !</div>
+          <button class="btn btn-red btn-full" onclick="saveProfCode()">Enregistrer nouveau code prof 🔐</button>
         </div>
       </div>
 
@@ -347,27 +366,7 @@
         </div>
       </div>
 
-      <!-- TAB RESET -->
-      <div class="tab-content" id="tab-reset">
-        <div class="card" style="max-width:100%;">
-          <p class="card-title">🗑️ Réinitialisation</p>
-          <div style="display:flex;flex-direction:column;gap:14px;">
-            <div>
-              <p style="color:#aaa;font-size:0.85rem;margin-bottom:10px;">Réinitialiser un élève :</p>
-              <div style="display:flex;gap:10px;flex-wrap:wrap;">
-                <input class="mario-input" type="text" id="reset-eleve-id" placeholder="ex: CAME_CVA" style="flex:1;min-width:150px;"/>
-                <button class="btn btn-red btn-sm" onclick="resetEleve()">Supprimer</button>
-              </div>
-            </div>
-            <div class="section-sep"></div>
-            <div>
-              <p style="color:#ff8080;font-size:0.85rem;margin-bottom:10px;">⚠️ Supprimer TOUTES les données élèves :</p>
-              <button class="btn btn-red btn-full" onclick="resetAll()">🗑️ Tout réinitialiser</button>
-            </div>
-          </div>
-          <div class="msg-box msg-success" id="reset-ok" style="margin-top:12px;"></div>
-        </div>
-      </div>
+
     </div>
     <footer>Créé par C. Iemfre <a href="#" onclick="showPage('page-rgpd');return false;">RGPD</a></footer>
   </div>
@@ -1004,16 +1003,37 @@ function spawnConfetti(){
 
 function checkProfCode(){
   const val=document.getElementById('prof-code-input').value.trim();
+  const stored=localStorage.getItem('gramy_code_prof')||'0504';
   const err=document.getElementById('prof-code-error');
   err.classList.remove('show');
-  if(val==='0504'){loadProfDashboard();showPage('page-prof');}
+  if(val===stored){loadProfDashboard();showPage('page-prof');}
   else{err.classList.add('show');document.getElementById('prof-code-input').value='';}
 }
 
 function loadProfDashboard(){
-  const code=localStorage.getItem('gramy_code_eleve')||'';
+  const codeEleve=localStorage.getItem('gramy_code_eleve')||'';
   const disp=document.getElementById('code-actuel-display');
-  if(disp)disp.textContent=code?`Code actuel : ${code}`:'Aucun code défini';
+  if(disp)disp.textContent=codeEleve?`Code actuel : ${codeEleve}`:'Aucun code défini';
+  const profDisp=document.getElementById('code-prof-display');
+  const profCode=localStorage.getItem('gramy_code_prof')||'0504';
+  if(profDisp)profDisp.textContent=`Code actuel : ${profCode}`;
+}
+
+function saveProfCode(){
+  const val=document.getElementById('new-prof-code').value.trim();
+  const conf=document.getElementById('new-prof-code-confirm').value.trim();
+  const errEl=document.getElementById('code-prof-error');
+  const okEl=document.getElementById('code-prof-ok');
+  errEl.classList.remove('show');okEl.classList.remove('show');
+  if(val.length<4){errEl.textContent='❌ Le code doit faire au moins 4 caractères.';errEl.classList.add('show');return;}
+  if(val!==conf){errEl.textContent='❌ Les deux codes ne correspondent pas.';errEl.classList.add('show');return;}
+  localStorage.setItem('gramy_code_prof',val);
+  const profDisp=document.getElementById('code-prof-display');
+  if(profDisp)profDisp.textContent=`Code actuel : ${val}`;
+  okEl.classList.add('show');spawnCoins(3);
+  document.getElementById('new-prof-code').value='';
+  document.getElementById('new-prof-code-confirm').value='';
+  setTimeout(()=>okEl.classList.remove('show'),3000);
 }
 
 function switchProfTab(btn,tabId){
